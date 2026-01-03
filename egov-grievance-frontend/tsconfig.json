@@ -4,6 +4,8 @@
   "compileOnSave": false,
   "compilerOptions": {
     "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "isolatedModules": true,
     "experimentalDecorators": true,
     "importHelpers": true,
