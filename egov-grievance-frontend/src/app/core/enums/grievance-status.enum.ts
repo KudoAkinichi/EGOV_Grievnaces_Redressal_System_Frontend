@@ -1,0 +1,8 @@
+export enum GrievanceStatus {
+  SUBMITTED = 'SUBMITTED',
+  ASSIGNED = 'ASSIGNED',
+  IN_REVIEW = 'IN_REVIEW',
+  RESOLVED = 'RESOLVED',
+  CLOSED = 'CLOSED',
+  ESCALATED = 'ESCALATED',
+}
