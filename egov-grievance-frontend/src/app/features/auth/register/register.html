@@ -1,1 +1,323 @@
-<p>register works!</p>
+<!-- src/app/features/auth/register/register.component.html -->
+
+<div class="auth-container">
+  <!-- Background decorative elements -->
+  <div class="auth-background">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+
+  <!-- Register Card -->
+  <div class="auth-card-wrapper">
+    <mat-card class="auth-card">
+      <!-- Logo Section -->
+      <div class="auth-logo">
+        <div class="logo-circle">
+          <mat-icon>how_to_reg</mat-icon>
+        </div>
+      </div>
+
+      <!-- Header -->
+      <mat-card-header class="auth-header">
+        <mat-card-title>Create Account</mat-card-title>
+        <mat-card-subtitle>Join E-Governance Grievance Portal</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <!-- Loading State -->
+        <div *ngIf="loadingDepartments" class="loading-state">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Loading departments...</p>
+        </div>
+
+        <!-- Registration Form -->
+        <form
+          [formGroup]="registerForm"
+          (ngSubmit)="onSubmit()"
+          class="auth-form"
+          *ngIf="!loadingDepartments"
+        >
+          <!-- Progress Indicator -->
+          <div class="progress-indicator">
+            <div
+              class="progress-step"
+              [class.active]="currentStep >= 1"
+              [class.completed]="currentStep > 1"
+            >
+              <div class="step-circle">1</div>
+              <span class="step-label">Personal</span>
+            </div>
+            <div class="progress-line" [class.completed]="currentStep > 1"></div>
+            <div
+              class="progress-step"
+              [class.active]="currentStep >= 2"
+              [class.completed]="currentStep > 2"
+            >
+              <div class="step-circle">2</div>
+              <span class="step-label">Contact</span>
+            </div>
+            <div class="progress-line" [class.completed]="currentStep > 2"></div>
+            <div class="progress-step" [class.active]="currentStep >= 3">
+              <div class="step-circle">3</div>
+              <span class="step-label">Security</span>
+            </div>
+          </div>
+
+          <!-- Step 1: Personal Information -->
+          <div class="form-step" *ngIf="currentStep === 1">
+            <h3 class="step-title">Personal Information</h3>
+
+            <!-- Full Name -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Full Name</mat-label>
+              <input
+                matInput
+                formControlName="fullName"
+                placeholder="Enter your full name"
+                autocomplete="name"
+              />
+              <mat-icon matPrefix class="field-icon">person</mat-icon>
+              <mat-error *ngIf="f['fullName'].hasError('required')">
+                Full name is required
+              </mat-error>
+              <mat-error *ngIf="f['fullName'].hasError('minlength')">
+                Name must be at least 3 characters
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Email -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Email Address</mat-label>
+              <input
+                matInput
+                type="email"
+                formControlName="email"
+                placeholder="your@email.com"
+                autocomplete="email"
+              />
+              <mat-icon matPrefix class="field-icon">email</mat-icon>
+              <mat-error *ngIf="f['email'].hasError('required')"> Email is required </mat-error>
+              <mat-error *ngIf="f['email'].hasError('email')">
+                Please enter a valid email
+              </mat-error>
+            </mat-form-field>
+
+            <div class="step-actions">
+              <button
+                mat-raised-button
+                color="primary"
+                type="button"
+                (click)="nextStep()"
+                [disabled]="f['fullName'].invalid || f['email'].invalid"
+                class="full-width"
+              >
+                Next Step
+                <mat-icon>arrow_forward</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2: Contact Information -->
+          <div class="form-step" *ngIf="currentStep === 2">
+            <h3 class="step-title">Contact Information</h3>
+
+            <!-- Phone Number -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Phone Number</mat-label>
+              <input
+                matInput
+                formControlName="phone"
+                placeholder="10-digit mobile number"
+                maxlength="10"
+                autocomplete="tel"
+              />
+              <mat-icon matPrefix class="field-icon">phone</mat-icon>
+              <mat-hint>Must start with 6, 7, 8, or 9</mat-hint>
+              <mat-error *ngIf="f['phone'].hasError('required')">
+                Phone number is required
+              </mat-error>
+              <mat-error *ngIf="f['phone'].hasError('pattern')">
+                Invalid phone number format
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Aadhaar Number -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Aadhaar Number</mat-label>
+              <input
+                matInput
+                formControlName="aadhaarNumber"
+                placeholder="12-digit Aadhaar number"
+                maxlength="12"
+                autocomplete="off"
+              />
+              <mat-icon matPrefix class="field-icon">credit_card</mat-icon>
+              <mat-hint>Enter 12-digit Aadhaar number</mat-hint>
+              <mat-error *ngIf="f['aadhaarNumber'].hasError('required')">
+                Aadhaar number is required
+              </mat-error>
+              <mat-error *ngIf="f['aadhaarNumber'].hasError('invalidAadhaar')">
+                Aadhaar must be exactly 12 digits
+              </mat-error>
+            </mat-form-field>
+
+            <div class="step-actions">
+              <button mat-button type="button" (click)="previousStep()" class="half-width">
+                <mat-icon>arrow_back</mat-icon>
+                Back
+              </button>
+              <button
+                mat-raised-button
+                color="primary"
+                type="button"
+                (click)="nextStep()"
+                [disabled]="f['phone'].invalid || f['aadhaarNumber'].invalid"
+                class="half-width"
+              >
+                Next Step
+                <mat-icon>arrow_forward</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 3: Security -->
+          <div class="form-step" *ngIf="currentStep === 3">
+            <h3 class="step-title">Security</h3>
+
+            <!-- Password -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Password</mat-label>
+              <input
+                matInput
+                [type]="hidePassword ? 'password' : 'text'"
+                formControlName="password"
+                autocomplete="new-password"
+              />
+              <mat-icon matPrefix class="field-icon">lock</mat-icon>
+              <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()">
+                <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+              <mat-hint>Min 8 chars with uppercase, lowercase, number & special char</mat-hint>
+              <mat-error *ngIf="f['password'].hasError('required')">
+                Password is required
+              </mat-error>
+              <mat-error *ngIf="f['password'].hasError('minlength')">
+                Password must be at least 8 characters
+              </mat-error>
+              <mat-error *ngIf="f['password'].hasError('weakPassword')">
+                Password must include uppercase, lowercase, number & special character
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Password Strength Indicator -->
+            <div class="password-strength" *ngIf="f['password'].value">
+              <div class="strength-bar">
+                <div
+                  class="strength-fill"
+                  [class.weak]="getPasswordStrength() === 'weak'"
+                  [class.medium]="getPasswordStrength() === 'medium'"
+                  [class.strong]="getPasswordStrength() === 'strong'"
+                  [style.width.%]="getPasswordStrengthPercent()"
+                ></div>
+              </div>
+              <span class="strength-text" [class]="getPasswordStrength()">
+                {{ getPasswordStrength() | titlecase }} Password
+              </span>
+            </div>
+
+            <!-- Confirm Password -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Confirm Password</mat-label>
+              <input
+                matInput
+                [type]="hideConfirmPassword ? 'password' : 'text'"
+                formControlName="confirmPassword"
+                autocomplete="new-password"
+              />
+              <mat-icon matPrefix class="field-icon">lock</mat-icon>
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                (click)="toggleConfirmPasswordVisibility()"
+              >
+                <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+              <mat-error *ngIf="f['confirmPassword'].hasError('required')">
+                Please confirm your password
+              </mat-error>
+              <mat-error
+                *ngIf="registerForm.hasError('passwordMismatch') && f['confirmPassword'].touched"
+              >
+                Passwords do not match
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Terms and Conditions -->
+            <div class="terms-section">
+              <mat-checkbox formControlName="acceptTerms" class="terms-checkbox">
+                I agree to the
+                <a href="#" target="_blank" (click)="$event.preventDefault()"
+                  >Terms and Conditions</a
+                >
+                and <a href="#" target="_blank" (click)="$event.preventDefault()">Privacy Policy</a>
+              </mat-checkbox>
+              <mat-error
+                *ngIf="f['acceptTerms'].hasError('required') && f['acceptTerms'].touched"
+                class="terms-error"
+              >
+                You must accept the terms and conditions
+              </mat-error>
+            </div>
+
+            <div class="step-actions">
+              <button
+                mat-button
+                type="button"
+                (click)="previousStep()"
+                [disabled]="loading"
+                class="half-width"
+              >
+                <mat-icon>arrow_back</mat-icon>
+                Back
+              </button>
+              <button
+                mat-raised-button
+                color="primary"
+                type="submit"
+                [disabled]="loading || registerForm.invalid"
+                class="half-width"
+              >
+                <span *ngIf="!loading" class="btn-content">
+                  <mat-icon>how_to_reg</mat-icon>
+                  Register
+                </span>
+                <mat-spinner diameter="24" *ngIf="loading"></mat-spinner>
+              </button>
+            </div>
+          </div>
+
+          <!-- Login Link -->
+          <div class="auth-switch">
+            <p>Already have an account?</p>
+            <button
+              mat-stroked-button
+              type="button"
+              routerLink="/auth/login"
+              class="full-width switch-btn"
+            >
+              <mat-icon>login</mat-icon>
+              Sign In Instead
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+
+      <!-- Footer -->
+      <div class="auth-footer">
+        <p>&copy; 2026 E-Governance Portal. All rights reserved.</p>
+      </div>
+    </mat-card>
+  </div>
+</div>
