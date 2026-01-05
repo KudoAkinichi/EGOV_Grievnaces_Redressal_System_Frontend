@@ -1,1 +1,38 @@
 <p>assign-grievance works!</p>
+<div class="assign-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Assign Grievance to Officer</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div *ngIf="grievance" class="grievance-info">
+        <p><strong>Grievance:</strong> {{ grievance.grievanceNumber }}</p>
+        <p><strong>Title:</strong> {{ grievance.title }}</p>
+        <p>
+          <strong>Status:</strong>
+          <app-status-badge [status]="grievance.status"></app-status-badge>
+        </p>
+      </div>
+
+      <form [formGroup]="assignForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Select Officer</mat-label>
+          <mat-select formControlName="officerId">
+            <mat-option *ngFor="let officer of officers" [value]="officer.id">
+              {{ officer.fullName }} ({{ officer.email }})
+            </mat-option>
+          </mat-select>
+          <mat-error>Officer is required</mat-error>
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button mat-button type="button" (click)="onCancel()">Cancel</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="loading">
+            Assign
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

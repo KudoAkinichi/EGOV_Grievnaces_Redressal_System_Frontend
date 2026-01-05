@@ -7,49 +7,30 @@ import {
   Router,
 } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { Observable, of } from 'rxjs';
+import { Observable, of, take, tap } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({ providedIn: 'root' })
-export class AuthGuard implements CanActivate, CanActivateChild {
+export class AuthGuard {
   constructor(
     private authService: AuthService,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
-  canActivate(): boolean {
+  canActivate(): Observable<boolean> {
     if (!isPlatformBrowser(this.platformId)) {
-      return true;
+      return of(true);
     }
 
-    const token = this.authService.getCurrentUserRole(); // triggers storage read safely
-    if (token) {
-      return true;
-    }
-
-    this.router.navigate(['/auth/login']);
-    return false;
-  }
-
-  canActivateChild(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-    return this.checkAuth(state.url);
-  }
-
-  private checkAuth(url: string): boolean {
-    // SSR safe
-    if (!isPlatformBrowser(this.platformId)) {
-      return true;
-    }
-
-    // 🔥 KEY FIX: synchronous token check
-    if (this.authService.isAuthenticated()) {
-      return true;
-    }
-
-    this.router.navigate(['/auth/login'], {
-      queryParams: { returnUrl: url },
-    });
-    return false;
+    return this.authService.isAuthenticated$.pipe(
+      take(1),
+      tap((isAuth) => {
+        if (!isAuth) {
+          console.warn('AuthGuard blocked route, redirecting to login');
+          this.router.navigate(['/auth/login']);
+        }
+      })
+    );
   }
 }

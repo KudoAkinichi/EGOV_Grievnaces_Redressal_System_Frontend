@@ -8,12 +8,11 @@ import { TokenService } from './services/token.service';
 
 // Guards
 import { AuthGuard } from './guards/auth-guard.guard';
-import { RoleGuard } from './guards/role-guard.guard';
 import { NoAuthGuard } from './guards/no-auth.guard';
 
 @NgModule({
   imports: [CommonModule],
-  providers: [AuthService, StorageService, TokenService, AuthGuard, RoleGuard, NoAuthGuard],
+  providers: [AuthService, StorageService, TokenService, AuthGuard, NoAuthGuard],
 })
 export class CoreModule {
   constructor(@Optional() @SkipSelf() parentModule: CoreModule) {

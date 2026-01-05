@@ -1,28 +1,27 @@
-import { Injectable } from '@angular/core';
-import {
-  CanActivate,
-  CanActivateChild,
-  ActivatedRouteSnapshot,
-  RouterStateSnapshot,
-  Router,
-} from '@angular/router';
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { UserRole } from '../models/user.model';
-import { DISABLE_GUARDS } from './guard-bypass';
 
-@Injectable({ providedIn: 'root' })
-export class RoleGuard {
-  constructor(private authService: AuthService, private router: Router) {}
+export const roleGuard = (allowedRoles: string[]): CanActivateFn => {
+  return () => {
+    const authService = inject(AuthService);
+    const router = inject(Router);
 
-  canActivate(route: ActivatedRouteSnapshot): boolean {
-    const allowedRoles = route.data['roles'] as UserRole[];
-    const role = this.authService.getCurrentUserRole();
+    const user = authService.getCurrentUser();
+    const token = authService.getToken();
 
-    if (!role || !allowedRoles.includes(role)) {
-      this.router.navigate(['/unauthorized']);
+    // 🔴 No token → login
+    if (!token || !user) {
+      router.navigate(['/auth/login']);
+      return false;
+    }
+
+    // 🔴 Role not allowed
+    if (!allowedRoles.includes(user.role)) {
+      router.navigate(['/unauthorized']);
       return false;
     }
 
     return true;
-  }
-}
+  };
+};
