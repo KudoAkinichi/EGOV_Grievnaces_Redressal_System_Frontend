@@ -1,0 +1,36 @@
+.sidebar {
+  height: 100%;
+  background-color: #fff;
+  border-right: 1px solid #e0e0e0;
+}
+
+.sidebar-nav {
+  padding-top: 8px;
+
+  mat-nav-list {
+    padding-top: 0;
+  }
+
+  a {
+    margin: 4px 8px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: rgba(103, 126, 234, 0.1);
+    }
+
+    &.active-link {
+      background-color: rgba(103, 126, 234, 0.15);
+      color: #667eea;
+
+      mat-icon {
+        color: #667eea;
+      }
+    }
+
+    mat-icon {
+      margin-right: 16px;
+    }
+  }
+}

@@ -1,1 +1,46 @@
-<p>navbar works!</p>
+<mat-toolbar color="primary" class="navbar">
+  <button mat-icon-button (click)="toggleSidenav()" class="menu-btn">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <span class="app-title">
+    <mat-icon class="app-icon">gavel</mat-icon>
+    E-Governance Grievance Portal
+  </span>
+
+  <span class="spacer"></span>
+
+  <div class="user-menu" *ngIf="currentUser">
+    <button mat-button [matMenuTriggerFor]="userMenu" class="user-btn">
+      <mat-icon>account_circle</mat-icon>
+      <span class="user-name">{{ currentUser.fullName }}</span>
+      <mat-icon>arrow_drop_down</mat-icon>
+    </button>
+
+    <mat-menu #userMenu="matMenu" xPosition="before">
+      <div class="user-info">
+        <div class="user-detail">
+          <strong>{{ currentUser.fullName }}</strong>
+          <small>{{ currentUser.email }}</small>
+          <mat-chip class="role-chip">
+            {{ currentUser.role | roleDisplay }}
+          </mat-chip>
+        </div>
+      </div>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="navigateToProfile()">
+        <mat-icon>person</mat-icon>
+        <span>Profile</span>
+      </button>
+      <button mat-menu-item (click)="navigateToSettings()">
+        <mat-icon>settings</mat-icon>
+        <span>Change Password</span>
+      </button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>exit_to_app</mat-icon>
+        <span>Logout</span>
+      </button>
+    </mat-menu>
+  </div>
+</mat-toolbar>

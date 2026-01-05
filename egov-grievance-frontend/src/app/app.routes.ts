@@ -3,8 +3,10 @@ import { AuthGuard } from './core/guards/auth-guard.guard';
 import { RoleGuard } from './core/guards/role-guard.guard';
 import { NoAuthGuard } from './core/guards/no-auth.guard';
 import { UserRole } from './core/models/user.model';
+import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
 
 export const routes: Routes = [
+  // 🔓 PUBLIC ROUTES (NO layout)
   {
     path: '',
     redirectTo: '/auth/login',
@@ -17,37 +19,43 @@ export const routes: Routes = [
     loadChildren: () => import('./features/auth/auth-module').then((m) => m.AuthModule),
   },
 
+  // 🔐 PROTECTED ROUTES (WITH layout)
   {
-    path: 'citizen',
-    canActivate: [AuthGuard, RoleGuard],
-    canActivateChild: [AuthGuard, RoleGuard],
-    data: { roles: [UserRole.CITIZEN] },
-    loadChildren: () => import('./features/citizen/citizen-module').then((m) => m.CitizenModule),
-  },
+    path: '',
+    component: MainLayoutComponent,
+    canActivate: [AuthGuard],
+    children: [
+      {
+        path: 'citizen',
+        canActivateChild: [RoleGuard],
+        data: { roles: [UserRole.CITIZEN] },
+        loadChildren: () =>
+          import('./features/citizen/citizen-module').then((m) => m.CitizenModule),
+      },
 
-  {
-    path: 'officer',
-    canActivate: [AuthGuard, RoleGuard],
-    canActivateChild: [AuthGuard, RoleGuard],
-    data: { roles: [UserRole.DEPT_OFFICER] },
-    loadChildren: () => import('./features/officer/officer-module').then((m) => m.OfficerModule),
-  },
+      {
+        path: 'officer',
+        canActivateChild: [RoleGuard],
+        data: { roles: [UserRole.DEPT_OFFICER] },
+        loadChildren: () =>
+          import('./features/officer/officer-module').then((m) => m.OfficerModule),
+      },
 
-  {
-    path: 'supervisor',
-    canActivate: [AuthGuard, RoleGuard],
-    canActivateChild: [AuthGuard, RoleGuard],
-    data: { roles: [UserRole.SUPERVISOR] },
-    loadChildren: () =>
-      import('./features/supervisor/supervisor-module').then((m) => m.SupervisorModule),
-  },
+      {
+        path: 'supervisor',
+        canActivateChild: [RoleGuard],
+        data: { roles: [UserRole.SUPERVISOR] },
+        loadChildren: () =>
+          import('./features/supervisor/supervisor-module').then((m) => m.SupervisorModule),
+      },
 
-  {
-    path: 'admin',
-    canActivate: [AuthGuard, RoleGuard],
-    canActivateChild: [AuthGuard, RoleGuard],
-    data: { roles: [UserRole.ADMIN] },
-    loadChildren: () => import('./features/admin/admin-module').then((m) => m.AdminModule),
+      {
+        path: 'admin',
+        canActivateChild: [RoleGuard],
+        data: { roles: [UserRole.ADMIN] },
+        loadChildren: () => import('./features/admin/admin-module').then((m) => m.AdminModule),
+      },
+    ],
   },
 
   {
