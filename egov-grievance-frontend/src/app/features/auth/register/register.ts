@@ -5,20 +5,17 @@ import {
   Validators,
   AbstractControl,
   ValidationErrors,
-  ReactiveFormsModule,
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../../core/services/auth.service';
 import { RegisterRequest } from '../../../core/models/user.model';
-import { MaterialModule } from '../../../shared/material.module';
 
 @Component({
   selector: 'app-register',
   standalone: false,
   templateUrl: './register.html',
   styleUrls: ['./register.scss'],
-  // imports: [MaterialModule, ReactiveFormsModule],
 })
 export class RegisterComponent implements OnInit {
   registerForm!: FormGroup;

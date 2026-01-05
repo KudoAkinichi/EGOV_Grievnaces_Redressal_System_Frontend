@@ -4,33 +4,12 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../../core/services/auth.service';
 import { LoginRequest } from '../../../core/models/user.model';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatChipsModule } from '@angular/material/chips';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   standalone: false,
   templateUrl: './login.html',
   styleUrls: ['./login.scss'],
-  // imports: [
-  //   CommonModule,
-  //   ReactiveFormsModule,
-  //   MatCardModule,
-  //   MatIconModule,
-  //   MatFormFieldModule,
-  //   MatInputModule,
-  //   MatButtonModule,
-  //   MatCheckboxModule,
-  //   MatProgressSpinnerModule,
-  //   MatChipsModule,
-  // ],
 })
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;

@@ -14,7 +14,7 @@
       <!-- Logo Section -->
       <div class="auth-logo">
         <div class="logo-circle">
-          <mat-icon>gavel</mat-icon>
+          <mat-icon>lock</mat-icon>
         </div>
       </div>
 
@@ -37,7 +37,7 @@
               placeholder="your@email.com"
               autocomplete="email"
             />
-            <mat-icon matPrefix class="field-icon">email</mat-icon>
+            <!-- <mat-icon matPrefix class="field-icon">email</mat-icon> -->
             <mat-error *ngIf="f['email'].hasError('required')"> Email is required </mat-error>
             <mat-error *ngIf="f['email'].hasError('email')"> Please enter a valid email </mat-error>
           </mat-form-field>
@@ -52,7 +52,7 @@
               placeholder="Enter your password"
               autocomplete="current-password"
             />
-            <mat-icon matPrefix class="field-icon">lock</mat-icon>
+            <!-- <mat-icon matPrefix class="field-icon">lock</mat-icon> -->
             <button
               mat-icon-button
               matSuffix
@@ -84,10 +84,7 @@
             class="full-width auth-submit-btn"
             [disabled]="loading"
           >
-            <span *ngIf="!loading" class="btn-content">
-              <mat-icon>login</mat-icon>
-              Sign In
-            </span>
+            <span *ngIf="!loading" class="btn-content"> Login </span>
             <mat-spinner diameter="24" *ngIf="loading"></mat-spinner>
           </button>
 
@@ -105,31 +102,8 @@
               routerLink="/auth/register"
               class="full-width switch-btn"
             >
-              <mat-icon>person_add</mat-icon>
               Register as Citizen
             </button>
-          </div>
-
-          <!-- Test Credentials Info -->
-          <div class="test-credentials">
-            <div class="test-header">
-              <mat-icon>info</mat-icon>
-              <span>Test Credentials</span>
-            </div>
-            <!-- <div class="credentials-list">
-              <div class="credential-item">
-                <mat-chip class="role-chip admin-chip">ADMIN</mat-chip>
-                <span class="credential-text">admin@gov.in / Admin@123</span>
-              </div>
-              <div class="credential-item">
-                <mat-chip class="role-chip citizen-chip">CITIZEN</mat-chip>
-                <span class="credential-text">rahul@example.com / Admin@123</span>
-              </div>
-              <div class="credential-item">
-                <mat-chip class="role-chip officer-chip">OFFICER</mat-chip>
-                <span class="credential-text">officer@dept.gov.in / Admin@123</span>
-              </div>
-            </div> -->
           </div>
         </form>
       </mat-card-content>

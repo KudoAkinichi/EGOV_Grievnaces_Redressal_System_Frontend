@@ -15,6 +15,8 @@ import {
   UserRole,
 } from '../models/user.model';
 import { ApiResponse } from '../models/api-response.model';
+import { Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({
   providedIn: 'root',
@@ -32,10 +34,12 @@ export class AuthService {
     private http: HttpClient,
     private router: Router,
     private storageService: StorageService,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    // Initialize auth state on service creation
-    this.initializeAuthState();
+    if (isPlatformBrowser(this.platformId)) {
+      this.initializeAuthState();
+    }
   }
 
   /**

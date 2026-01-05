@@ -5,23 +5,17 @@ import {
   Validators,
   AbstractControl,
   ValidationErrors,
-  ReactiveFormsModule,
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../../core/services/auth.service';
 import { ChangePasswordRequest } from '../../../core/models/user.model';
-import { MatIcon } from '@angular/material/icon';
-import { MatCard, MatCardHeader, MatCardTitle, MatCardContent } from '@angular/material/card';
-import { MatFormField, MatLabel, MatHint } from '@angular/material/form-field';
-import { MaterialModule } from '../../../shared/material.module';
 
 @Component({
   selector: 'app-change-password',
   standalone: false,
   templateUrl: './change-password.html',
   styleUrls: ['./change-password.scss'],
-  // imports: [ReactiveFormsModule, MaterialModule],
 })
 export class ChangePasswordComponent implements OnInit {
   changePasswordForm!: FormGroup;
