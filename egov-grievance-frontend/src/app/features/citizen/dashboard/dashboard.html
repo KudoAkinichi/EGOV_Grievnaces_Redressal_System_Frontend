@@ -1,1 +1,133 @@
-<p>dashboard works!</p>
+<div class="dashboard-container">
+  <!-- Welcome Header -->
+  <div class="welcome-section">
+    <h1>Welcome back, {{ userName }}!</h1>
+    <p>Track and manage your grievances from this dashboard</p>
+  </div>
+
+  <!-- Loading State -->
+  <app-loader *ngIf="loading" message="Loading dashboard..."></app-loader>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="!loading && stats">
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <button mat-raised-button color="primary" (click)="navigateToLodgeGrievance()">
+        <mat-icon>add_circle</mat-icon>
+        Lodge New Grievance
+      </button>
+      <button mat-raised-button color="accent" (click)="navigateToMyGrievances()">
+        <mat-icon>list</mat-icon>
+        View All Grievances
+      </button>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+      <div class="stat-card total-card">
+        <mat-icon class="stat-icon" color="primary">assignment</mat-icon>
+        <div class="stat-value">{{ stats.totalGrievances }}</div>
+        <div class="stat-label">Total Grievances</div>
+      </div>
+
+      <div class="stat-card open-card">
+        <mat-icon class="stat-icon" style="color: #ff9800">pending_actions</mat-icon>
+        <div class="stat-value">{{ getOpenGrievancesCount() }}</div>
+        <div class="stat-label">Open Grievances</div>
+      </div>
+
+      <div class="stat-card resolved-card">
+        <mat-icon class="stat-icon" style="color: #4caf50">check_circle</mat-icon>
+        <div class="stat-value">{{ stats.resolved }}</div>
+        <div class="stat-label">Resolved</div>
+      </div>
+
+      <div class="stat-card closed-card">
+        <mat-icon class="stat-icon" style="color: #9c27b0">done_all</mat-icon>
+        <div class="stat-value">{{ stats.closed }}</div>
+        <div class="stat-label">Closed</div>
+      </div>
+
+      <div class="stat-card escalated-card" *ngIf="stats.escalated > 0">
+        <mat-icon class="stat-icon" style="color: #f44336">priority_high</mat-icon>
+        <div class="stat-value">{{ stats.escalated }}</div>
+        <div class="stat-label">Escalated</div>
+      </div>
+    </div>
+
+    <!-- Status Breakdown -->
+    <mat-card class="status-breakdown-card">
+      <mat-card-header>
+        <mat-card-title>Status Breakdown</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="status-list">
+          <div class="status-item">
+            <app-status-badge [status]="'SUBMITTED'"></app-status-badge>
+            <span class="status-count">{{ stats.submitted }}</span>
+          </div>
+          <div class="status-item">
+            <app-status-badge [status]="'ASSIGNED'"></app-status-badge>
+            <span class="status-count">{{ stats.assigned }}</span>
+          </div>
+          <div class="status-item">
+            <app-status-badge [status]="'IN_REVIEW'"></app-status-badge>
+            <span class="status-count">{{ stats.inReview }}</span>
+          </div>
+          <div class="status-item">
+            <app-status-badge [status]="'RESOLVED'"></app-status-badge>
+            <span class="status-count">{{ stats.resolved }}</span>
+          </div>
+          <div class="status-item">
+            <app-status-badge [status]="'CLOSED'"></app-status-badge>
+            <span class="status-count">{{ stats.closed }}</span>
+          </div>
+          <div class="status-item" *ngIf="stats.escalated > 0">
+            <app-status-badge [status]="'ESCALATED'"></app-status-badge>
+            <span class="status-count">{{ stats.escalated }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Recent Grievances -->
+    <mat-card class="recent-grievances-card">
+      <mat-card-header>
+        <mat-card-title>Recent Grievances</mat-card-title>
+        <button mat-button color="primary" (click)="navigateToMyGrievances()">
+          View All
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </mat-card-header>
+      <mat-card-content>
+        <div *ngIf="recentGrievances.length === 0" class="no-data">
+          <mat-icon>inbox</mat-icon>
+          <p>No grievances found. Lodge your first grievance!</p>
+          <button mat-raised-button color="primary" (click)="navigateToLodgeGrievance()">
+            Lodge Grievance
+          </button>
+        </div>
+
+        <mat-list *ngIf="recentGrievances.length > 0">
+          <mat-list-item
+            *ngFor="let grievance of recentGrievances"
+            class="grievance-item"
+            (click)="navigateToGrievanceDetails(grievance.id)"
+          >
+            <div matListItemTitle class="grievance-title">
+              <strong>{{ grievance.grievanceNumber }}</strong>
+              <span class="separator">-</span>
+              {{ grievance.title }}
+            </div>
+            <div matListItemLine class="grievance-meta">
+              <span>{{ grievance.createdAt | date : 'medium' }}</span>
+            </div>
+            <div matListItemMeta>
+              <app-status-badge [status]="grievance.status"></app-status-badge>
+            </div>
+          </mat-list-item>
+        </mat-list>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

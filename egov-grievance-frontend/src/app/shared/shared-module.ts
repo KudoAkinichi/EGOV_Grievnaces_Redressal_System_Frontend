@@ -1,14 +1,16 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 import { MaterialModule } from './material.module';
 
-// import components
+// Components
 import { NavbarComponent } from './components/navbar/navbar';
 import { SidebarComponent } from './components/sidebar/sidebar';
 import { MainLayoutComponent } from '../layouts/main-layout/main-layout.component';
-import { RouterOutlet } from '@angular/router';
+
+// Pipes
 import { StatusDisplayPipe } from './pipes/status-display-pipe';
 import { RoleDisplayPipe } from './pipes/role-display-pipe';
 
@@ -20,11 +22,12 @@ import { RoleDisplayPipe } from './pipes/role-display-pipe';
     StatusDisplayPipe,
     RoleDisplayPipe,
   ],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MaterialModule, RouterOutlet],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, MaterialModule],
   exports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    RouterModule,
     MaterialModule,
     NavbarComponent,
     SidebarComponent,

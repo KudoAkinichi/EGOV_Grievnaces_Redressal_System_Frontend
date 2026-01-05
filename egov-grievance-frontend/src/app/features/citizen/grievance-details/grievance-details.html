@@ -1,1 +1,206 @@
-<p>grievance-details works!</p>
+<!-- Grievance Details Page -->
+<div class="grievance-details-container">
+  <!-- Loading State -->
+  <app-loader *ngIf="loading" message="Loading grievance details..."></app-loader>
+
+  <!-- Content -->
+  <div *ngIf="!loading && grievance" class="details-content">
+    <!-- Back Button -->
+    <button mat-button class="back-btn" routerLink="/citizen/my-grievances">
+      <mat-icon>arrow_back</mat-icon>
+      Back to My Grievances
+    </button>
+
+    <!-- Grievance Header Card -->
+    <mat-card class="header-card">
+      <div class="header-content">
+        <div class="title-section">
+          <h1>{{ grievance.grievanceNumber }}</h1>
+          <app-status-badge [status]="grievance.status" [showIcon]="true"></app-status-badge>
+        </div>
+        <div class="action-buttons">
+          <button mat-raised-button color="warn" *ngIf="canEscalate()" (click)="escalate()">
+            <mat-icon>priority_high</mat-icon>
+            Escalate
+          </button>
+          <button
+            mat-raised-button
+            color="primary"
+            *ngIf="canProvideFeedback()"
+            (click)="navigateToFeedback()"
+          >
+            <mat-icon>star</mat-icon>
+            Submit Feedback
+          </button>
+          <button mat-raised-button color="accent" *ngIf="canClose()" (click)="closeGrievance()">
+            <mat-icon>done_all</mat-icon>
+            Close Grievance
+          </button>
+          <button mat-button color="warn" *ngIf="canWithdraw()" (click)="withdraw()">
+            <mat-icon>cancel</mat-icon>
+            Withdraw
+          </button>
+        </div>
+      </div>
+    </mat-card>
+
+    <!-- Grievance Details Card -->
+    <mat-card class="details-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>description</mat-icon>
+          Grievance Details
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="details-grid">
+          <div class="detail-item">
+            <label>Title:</label>
+            <p>{{ grievance.title }}</p>
+          </div>
+          <div class="detail-item full-width">
+            <label>Description:</label>
+            <p class="description-text">{{ grievance.description }}</p>
+          </div>
+          <div class="detail-item">
+            <label>Department:</label>
+            <p>{{ grievance.departmentName || 'N/A' }}</p>
+          </div>
+          <div class="detail-item">
+            <label>Category:</label>
+            <p>{{ grievance.categoryName || 'N/A' }}</p>
+          </div>
+          <div class="detail-item">
+            <label>Priority:</label>
+            <mat-chip [class]="'priority-' + grievance.priority.toLowerCase()">
+              {{ grievance.priority }}
+            </mat-chip>
+          </div>
+          <div class="detail-item">
+            <label>Submitted On:</label>
+            <p>{{ grievance.createdAt | date : 'medium' }}</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Documents Card -->
+    <mat-card class="documents-card" *ngIf="documents.length > 0">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>attach_file</mat-icon>
+          Attached Documents ({{ documents.length }})
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="documents-grid">
+          <div *ngFor="let doc of documents" class="document-item">
+            <mat-icon class="doc-icon">
+              {{ isImageFile(doc) ? 'image' : isPdfFile(doc) ? 'picture_as_pdf' : 'description' }}
+            </mat-icon>
+            <div class="doc-info">
+              <span class="doc-name">{{ doc.fileName }}</span>
+              <span class="doc-size">{{ (doc.fileSize / 1024).toFixed(2) }} KB</span>
+            </div>
+            <div class="doc-actions">
+              <button mat-icon-button (click)="viewDocument(doc)" matTooltip="View">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button mat-icon-button (click)="downloadDocument(doc)" matTooltip="Download">
+                <mat-icon>download</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Status History Card -->
+    <mat-card class="history-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>history</mat-icon>
+          Status History
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="timeline">
+          <div
+            *ngFor="let history of statusHistory; let i = index; let last = last"
+            class="timeline-item"
+          >
+            <div class="timeline-marker">
+              <div class="marker-dot" [class.current]="i === 0"></div>
+              <div class="marker-line" *ngIf="!last"></div>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <app-status-badge [status]="history.newStatus"></app-status-badge>
+                <span class="timeline-date">{{ history.createdAt | date : 'medium' }}</span>
+              </div>
+              <p class="timeline-remarks" *ngIf="history.remarks">{{ history.remarks }}</p>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Comments Card -->
+    <mat-card class="comments-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>comment</mat-icon>
+          Comments ({{ comments.length }})
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <!-- Existing Comments -->
+        <div class="comments-list" *ngIf="comments.length > 0">
+          <div *ngFor="let comment of comments" class="comment-item">
+            <div class="comment-header">
+              <mat-chip
+                [class]="comment.senderRole === 'CITIZEN' ? 'citizen-chip' : 'officer-chip'"
+              >
+                {{ comment.senderRole | roleDisplay }}
+              </mat-chip>
+              <span class="comment-time">{{ comment.createdAt | date : 'short' }}</span>
+            </div>
+            <p class="comment-message">{{ comment.message }}</p>
+          </div>
+        </div>
+
+        <!-- Add Comment Form -->
+        <div class="add-comment-section">
+          <h4>Add a Comment</h4>
+          <form [formGroup]="commentForm" (ngSubmit)="addComment()">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Your Comment</mat-label>
+              <textarea
+                matInput
+                formControlName="message"
+                rows="3"
+                placeholder="Ask a question or provide additional information..."
+              >
+              </textarea>
+              <mat-error *ngIf="commentForm.get('message')?.hasError('required')">
+                Comment is required
+              </mat-error>
+              <mat-error *ngIf="commentForm.get('message')?.hasError('minlength')">
+                Minimum 5 characters required
+              </mat-error>
+            </mat-form-field>
+            <button
+              mat-raised-button
+              color="primary"
+              type="submit"
+              [disabled]="addingComment || commentForm.invalid"
+            >
+              <span *ngIf="!addingComment">Post Comment</span>
+              <mat-spinner diameter="20" *ngIf="addingComment"></mat-spinner>
+            </button>
+          </form>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

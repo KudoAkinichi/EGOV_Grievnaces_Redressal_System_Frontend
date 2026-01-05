@@ -6,6 +6,4 @@ import { Component } from '@angular/core';
   templateUrl: './file-upload.html',
   styleUrl: './file-upload.scss',
 })
-export class FileUpload {
-
-}
+export class FileUploadResult {}

@@ -1,1 +1,130 @@
-<p>lodge-grievance works!</p>
+<div class="lodge-grievance-container">
+  <mat-card class="form-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon class="title-icon">add_circle</mat-icon>
+        Lodge New Grievance
+      </mat-card-title>
+      <mat-card-subtitle> Fill in the details below to register your grievance </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <app-loader *ngIf="loadingDepartments" message="Loading departments..."></app-loader>
+
+      <form [formGroup]="grievanceForm" (ngSubmit)="onSubmit()" *ngIf="!loadingDepartments">
+        <!-- Grievance Title -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Grievance Title</mat-label>
+          <input
+            matInput
+            formControlName="title"
+            placeholder="Brief title of your grievance"
+            maxlength="200"
+          />
+          <mat-hint align="end">{{ getCharacterCount('title') }}/200</mat-hint>
+          <mat-error *ngIf="f['title'].hasError('required')">Title is required</mat-error>
+          <mat-error *ngIf="f['title'].hasError('minlength')"
+            >Minimum 10 characters required</mat-error
+          >
+        </mat-form-field>
+
+        <!-- Department Selection -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Select Department</mat-label>
+          <mat-select
+            formControlName="departmentId"
+            (selectionChange)="onDepartmentChange($event.value)"
+          >
+            <mat-option *ngFor="let dept of departments" [value]="dept.id">
+              {{ dept.name }}
+            </mat-option>
+          </mat-select>
+          <mat-hint>Choose the relevant government department</mat-hint>
+          <mat-error *ngIf="f['departmentId'].hasError('required')"
+            >Department is required</mat-error
+          >
+        </mat-form-field>
+
+        <!-- Category Selection -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Select Category</mat-label>
+          <mat-select formControlName="categoryId" [disabled]="categories.length === 0">
+            <mat-option *ngFor="let category of categories" [value]="category.id">
+              {{ category.name }}
+            </mat-option>
+          </mat-select>
+          <mat-hint *ngIf="categories.length === 0 && f['departmentId'].value">
+            No categories available for selected department
+          </mat-hint>
+          <mat-hint *ngIf="categories.length === 0 && !f['departmentId'].value">
+            Select a department first
+          </mat-hint>
+          <mat-error *ngIf="f['categoryId'].hasError('required')">Category is required</mat-error>
+        </mat-form-field>
+
+        <!-- Description -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Detailed Description</mat-label>
+          <textarea
+            matInput
+            formControlName="description"
+            placeholder="Provide detailed information about your grievance"
+            rows="6"
+            maxlength="2000"
+          >
+          </textarea>
+          <mat-hint align="end">{{ getCharacterCount('description') }}/2000</mat-hint>
+          <mat-error *ngIf="f['description'].hasError('required')"
+            >Description is required</mat-error
+          >
+          <mat-error *ngIf="f['description'].hasError('minlength')"
+            >Minimum 20 characters required</mat-error
+          >
+        </mat-form-field>
+
+        <!-- File Upload -->
+        <div class="file-upload-section">
+          <h3>Supporting Documents (Optional)</h3>
+          <p class="section-hint">Upload images, PDFs, or documents to support your grievance</p>
+          <app-file-upload
+            [multiple]="true"
+            [accept]="'.jpg,.jpeg,.png,.pdf,.doc,.docx'"
+            (fileSelected)="onFilesSelected($event)"
+          >
+          </app-file-upload>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button mat-button type="button" (click)="onCancel()" [disabled]="loading">Cancel</button>
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="loading || grievanceForm.invalid"
+          >
+            <span *ngIf="!loading">
+              <mat-icon>send</mat-icon>
+              Lodge Grievance
+            </span>
+            <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+          </button>
+        </div>
+
+        <!-- Important Notice -->
+        <div class="notice-section">
+          <mat-icon>info</mat-icon>
+          <div class="notice-content">
+            <strong>Important:</strong>
+            <ul>
+              <li>Your grievance will be automatically assigned to an officer</li>
+              <li>You will receive email notifications for status updates</li>
+              <li>Grievance number will be generated for tracking</li>
+              <li>If not resolved within 72 hours, it will be auto-escalated</li>
+            </ul>
+          </div>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

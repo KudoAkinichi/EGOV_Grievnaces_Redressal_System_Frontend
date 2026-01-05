@@ -1,1 +1,70 @@
-<p>feedback-form works!</p>
+<div class="feedback-form-container">
+  <mat-card class="feedback-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon class="title-icon">star</mat-icon>
+        Submit Feedback
+      </mat-card-title>
+      <mat-card-subtitle *ngIf="grievance">
+        Grievance: {{ grievance.grievanceNumber }} - {{ grievance.title }}
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <app-loader *ngIf="loadingGrievance" message="Loading..."></app-loader>
+
+      <form [formGroup]="feedbackForm" (ngSubmit)="onSubmit()" *ngIf="!loadingGrievance">
+        <div class="rating-section">
+          <h3>How satisfied are you with the resolution?</h3>
+          <div class="star-rating">
+            <mat-icon
+              *ngFor="let star of getStarArray()"
+              [class.filled]="star <= rating"
+              (click)="setRating(star)"
+              class="star"
+            >
+              {{ star <= rating ? 'star' : 'star_border' }}
+            </mat-icon>
+          </div>
+          <p class="rating-text" *ngIf="rating > 0">{{ rating }} out of 5 stars</p>
+          <mat-error *ngIf="f['rating'].hasError('required') && f['rating'].touched">
+            Please select a rating
+          </mat-error>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Your Comments</mat-label>
+          <textarea
+            matInput
+            formControlName="comments"
+            placeholder="Share your experience with the resolution process"
+            rows="6"
+            maxlength="500"
+          >
+          </textarea>
+          <mat-hint align="end">{{ f['comments'].value?.length || 0 }}/500</mat-hint>
+          <mat-error *ngIf="f['comments'].hasError('required')">Comments are required</mat-error>
+          <mat-error *ngIf="f['comments'].hasError('minlength')"
+            >Minimum 10 characters required</mat-error
+          >
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button mat-button type="button" (click)="onCancel()" [disabled]="loading">Cancel</button>
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="loading || feedbackForm.invalid"
+          >
+            <span *ngIf="!loading">
+              <mat-icon>send</mat-icon>
+              Submit Feedback
+            </span>
+            <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

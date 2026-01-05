@@ -1,0 +1,454 @@
+// src/app/features/citizen/my-grievances/my-grievances.component.scss
+
+.my-grievances-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+// Header Card
+.header-card {
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+
+  mat-card-header {
+    padding: 24px;
+  }
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .title-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .header-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      color: white;
+    }
+
+    .title-text {
+      h2 {
+        margin: 0;
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: white;
+      }
+
+      p {
+        margin: 4px 0 0 0;
+        font-size: 0.875rem;
+        opacity: 0.9;
+      }
+    }
+  }
+
+  .lodge-btn {
+    background-color: white !important;
+    color: #667eea !important;
+    font-weight: 600;
+    padding: 0 24px;
+    height: 48px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+
+    mat-icon {
+      margin-right: 8px;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    }
+  }
+}
+
+// Content Card
+.content-card {
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+// Tabs Styling
+::ng-deep .mat-mdc-tab-group {
+  .mat-mdc-tab-labels {
+    background-color: #f9f9f9;
+    border-radius: 8px 8px 0 0;
+  }
+
+  .mat-mdc-tab-label {
+    min-width: 200px;
+    height: 64px;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+
+    &.mat-mdc-tab-label-active {
+      opacity: 1;
+      background-color: white;
+    }
+
+    .tab-icon {
+      margin-right: 8px;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+
+    .tab-label {
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    .count-chip {
+      margin-left: 12px;
+      font-size: 0.75rem;
+      height: 24px;
+      min-width: 32px;
+      font-weight: 600;
+
+      &.open-chip {
+        background-color: #2196f3;
+        color: white;
+      }
+
+      &.closed-chip {
+        background-color: #9c27b0;
+        color: white;
+      }
+
+      &.escalated-chip {
+        background-color: #f44336;
+        color: white;
+      }
+    }
+  }
+}
+
+// Table Container
+.table-container {
+  padding: 24px;
+  min-height: 400px;
+}
+
+// No Data State
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  text-align: center;
+
+  mat-icon {
+    font-size: 80px;
+    width: 80px;
+    height: 80px;
+    color: #ccc;
+    margin-bottom: 24px;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    color: #333;
+    margin: 0 0 12px 0;
+  }
+
+  p {
+    font-size: 1rem;
+    color: #666;
+    margin: 0 0 24px 0;
+  }
+
+  button {
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+      color: white;
+    }
+  }
+}
+
+// Table Styling
+.grievances-table {
+  width: 100%;
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+
+  th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+    color: #333;
+    font-size: 0.875rem;
+    padding: 16px;
+  }
+
+  td {
+    padding: 16px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .table-row {
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #f9f9f9;
+      transform: scale(1.01);
+    }
+
+    &.urgent-row {
+      border-left: 4px solid #f44336;
+      background-color: #ffebee;
+
+      &:hover {
+        background-color: #ffcdd2;
+      }
+    }
+  }
+
+  // Grievance Number Cell
+  .grievance-number-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .grievance-number {
+      font-weight: 600;
+      color: #667eea;
+      font-size: 0.875rem;
+    }
+
+    .priority-chip {
+      font-size: 0.65rem;
+      height: 20px;
+      font-weight: 600;
+
+      &.priority-high {
+        background-color: #ff9800;
+        color: white;
+      }
+
+      &.priority-critical {
+        background-color: #f44336;
+        color: white;
+        animation: pulse 2s infinite;
+      }
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+
+  // Title Cell
+  .title-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .title-text {
+      font-weight: 500;
+      color: #333;
+      font-size: 0.875rem;
+    }
+
+    .department-text {
+      font-size: 0.75rem;
+      color: #999;
+    }
+  }
+
+  // Date Cell
+  .date-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.813rem;
+    color: #666;
+
+    .date-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      color: #999;
+    }
+  }
+
+  // Action Button
+  .action-btn {
+    color: #667eea;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: rgba(102, 126, 234, 0.1);
+      transform: scale(1.1);
+    }
+  }
+}
+
+// Paginator
+::ng-deep .mat-mdc-paginator {
+  background-color: #f9f9f9;
+  border-radius: 0 0 8px 8px;
+  margin-top: 16px;
+}
+
+// Info Card
+.info-card {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-left: 4px solid #2196f3;
+
+  .info-content {
+    display: flex;
+    gap: 16px;
+
+    mat-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+      color: #2196f3;
+      flex-shrink: 0;
+    }
+
+    .info-text {
+      flex: 1;
+
+      h4 {
+        margin: 0 0 12px 0;
+        font-size: 1rem;
+        color: #1976d2;
+        font-weight: 600;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 20px;
+
+        li {
+          margin-bottom: 8px;
+          font-size: 0.875rem;
+          color: #333;
+          line-height: 1.5;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 1024px) {
+  .grievances-table {
+    .title-cell .department-text,
+    .date-cell {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .my-grievances-container {
+    padding: 16px;
+  }
+
+  .header-card {
+    .header-content {
+      flex-direction: column;
+      align-items: stretch;
+
+      .title-section {
+        flex-direction: column;
+        text-align: center;
+
+        .header-icon {
+          font-size: 40px;
+          width: 40px;
+          height: 40px;
+        }
+
+        .title-text h2 {
+          font-size: 1.5rem;
+        }
+      }
+
+      .lodge-btn {
+        width: 100%;
+      }
+    }
+  }
+
+  ::ng-deep .mat-mdc-tab-label {
+    min-width: 120px;
+    padding: 0 12px;
+
+    .tab-label {
+      display: none;
+    }
+
+    .count-chip {
+      margin-left: 4px;
+    }
+  }
+
+  .table-container {
+    padding: 16px;
+    overflow-x: auto;
+  }
+
+  .grievances-table {
+    min-width: 600px;
+  }
+
+  .info-card {
+    .info-content {
+      flex-direction: column;
+
+      mat-icon {
+        align-self: center;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .header-card {
+    .title-section .title-text h2 {
+      font-size: 1.25rem;
+    }
+  }
+
+  .no-data {
+    padding: 40px 16px;
+
+    mat-icon {
+      font-size: 60px;
+      width: 60px;
+      height: 60px;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+    }
+  }
+}
