@@ -48,6 +48,18 @@ export class OfficerGrievanceService {
     return this.http.get<ApiResponse<any>>(`${this.GRIEVANCE_URL}`, { params });
   }
 
+  getDepartmentGrievances(
+    page = 0,
+    size = 1000
+  ): Observable<ApiResponse<{ content: Grievance[] }>> {
+    return this.http.get<ApiResponse<{ content: Grievance[] }>>(`${this.GRIEVANCE_URL}`, {
+      params: {
+        page,
+        size,
+      },
+    });
+  }
+
   // ================= SINGLE GRIEVANCE =================
 
   getGrievanceById(id: number): Observable<ApiResponse<Grievance>> {

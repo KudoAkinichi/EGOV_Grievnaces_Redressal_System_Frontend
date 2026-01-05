@@ -95,7 +95,8 @@
         <p>No grievances found</p>
       </div>
 
-      <mat-paginator [pageSizeOptions]="[10, 25, 50, 100]" showFirstLastButtons></mat-paginator>
+      <mat-paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20, 100]" showFirstLastButtons>
+      </mat-paginator>
     </div>
   </mat-card>
 </div>

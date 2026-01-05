@@ -68,20 +68,19 @@ export class GrievanceListComponent implements OnInit, AfterViewInit {
   loadGrievances(): void {
     this.loading = true;
 
-    this.officerService
-      .getAllGrievances(this.selectedFilter === 'assigned' ? 'ASSIGNED' : this.selectedFilter)
-      .subscribe({
-        next: (response) => {
-          if (response.success && response.data?.content) {
-            this.allGrievances = response.data.content;
-            this.dataSource.data = this.allGrievances;
-          }
-          this.loading = false;
-        },
-        error: () => {
-          this.loading = false;
-        },
-      });
+    this.officerService.getDepartmentGrievances(0, 1000).subscribe({
+      next: (response) => {
+        if (response.success && response.data?.content) {
+          this.allGrievances = response.data.content;
+          this.applyFilter();
+        }
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading grievances:', error);
+        this.loading = false;
+      },
+    });
   }
 
   loadAssignedGrievances(): void {
@@ -95,21 +94,32 @@ export class GrievanceListComponent implements OnInit, AfterViewInit {
   }
 
   applyFilter(): void {
-    let filtered: Grievance[];
+    let filtered: Grievance[] = [];
 
     switch (this.selectedFilter) {
       case 'assigned':
-        filtered = this.allGrievances.filter((g) => this.assignedGrievanceIds.includes(g.id));
+        filtered = this.allGrievances.filter((g) => g.assignedOfficerId === this.officerId);
         break;
-      case 'all':
-        filtered = this.allGrievances;
-        break;
-      default:
+
+      case 'RESOLVED':
+      case 'IN_REVIEW':
+      case 'ASSIGNED':
         filtered = this.allGrievances.filter((g) => g.status === this.selectedFilter);
+        break;
+
+      case 'all':
+      default:
+        filtered = [...this.allGrievances];
     }
 
+    // 🔑 CRITICAL PART
     this.dataSource.data = filtered;
-    this.dataSource.paginator = this.paginator;
+
+    // 🔑 RE-ATTACH paginator
+    if (this.paginator) {
+      this.dataSource.paginator = this.paginator;
+      this.paginator.firstPage();
+    }
   }
 
   viewDetails(grievanceId: number): void {
