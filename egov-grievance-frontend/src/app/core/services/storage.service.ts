@@ -1,79 +1,78 @@
 // src/app/core/services/storage.service.ts
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class StorageService {
+  private isBrowser: boolean;
+
+  constructor(@Inject(PLATFORM_ID) platformId: Object) {
+    this.isBrowser = isPlatformBrowser(platformId);
+  }
+
   // ================= TOKEN =================
   setToken(token: string): void {
-    localStorage.setItem(environment.storageKeys.token, token);
+    if (this.isBrowser) {
+      localStorage.setItem(environment.storageKeys.token, token);
+    }
   }
 
   getToken(): string | null {
+    if (!this.isBrowser) return null;
     return localStorage.getItem(environment.storageKeys.token);
   }
 
   removeToken(): void {
-    localStorage.removeItem(environment.storageKeys.token);
+    if (this.isBrowser) {
+      localStorage.removeItem(environment.storageKeys.token);
+    }
   }
 
   // ================= USER ID =================
   setUserId(userId: number): void {
-    localStorage.setItem(environment.storageKeys.userId, userId.toString());
+    if (this.isBrowser) {
+      localStorage.setItem(environment.storageKeys.userId, userId.toString());
+    }
   }
 
   getUserId(): number | null {
+    if (!this.isBrowser) return null;
     const userId = localStorage.getItem(environment.storageKeys.userId);
     return userId ? Number(userId) : null;
   }
 
   removeUserId(): void {
-    localStorage.removeItem(environment.storageKeys.userId);
+    if (this.isBrowser) {
+      localStorage.removeItem(environment.storageKeys.userId);
+    }
   }
 
   // ================= USER OBJECT =================
   setUser<T>(user: T): void {
-    localStorage.setItem(environment.storageKeys.user, JSON.stringify(user));
+    if (this.isBrowser) {
+      localStorage.setItem(environment.storageKeys.user, JSON.stringify(user));
+    }
   }
 
   getUser<T>(): T | null {
+    if (!this.isBrowser) return null;
     const user = localStorage.getItem(environment.storageKeys.user);
     return user ? JSON.parse(user) : null;
   }
 
   removeUser(): void {
-    localStorage.removeItem(environment.storageKeys.user);
+    if (this.isBrowser) {
+      localStorage.removeItem(environment.storageKeys.user);
+    }
   }
 
   // ================= CLEAR ALL =================
   clearAll(): void {
-    this.removeToken();
-    this.removeUserId();
-    this.removeUser();
-  }
-
-  // ================= SESSION STORAGE =================
-  setSessionItem(key: string, value: unknown): void {
-    sessionStorage.setItem(key, JSON.stringify(value));
-  }
-
-  getSessionItem<T>(key: string): T | null {
-    const item = sessionStorage.getItem(key);
-    return item ? JSON.parse(item) : null;
-  }
-
-  removeSessionItem(key: string): void {
-    sessionStorage.removeItem(key);
-  }
-
-  clearSessionStorage(): void {
-    sessionStorage.clear();
-  }
-
-  // ================= AUTH STATE =================
-  isLoggedIn(): boolean {
-    return !!this.getToken() && !!this.getUserId();
+    if (this.isBrowser) {
+      localStorage.clear();
+    }
   }
 }

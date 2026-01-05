@@ -1,1 +1,21 @@
-<p>file-upload works!</p>
+<div class="file-upload">
+  <input type="file" id="fileInput" hidden (change)="onFileChange($event)" />
+
+  <button mat-stroked-button color="primary" (click)="fileInput.click()" #fileInput>
+    <mat-icon>upload</mat-icon>
+    Upload Document
+  </button>
+
+  <div class="file-info" *ngIf="selectedFile">
+    <mat-icon color="primary">description</mat-icon>
+    <span>{{ selectedFile.fileName }}</span>
+
+    <button mat-icon-button color="warn" (click)="removeFile()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-error *ngIf="errorMessage">
+    {{ errorMessage }}
+  </mat-error>
+</div>

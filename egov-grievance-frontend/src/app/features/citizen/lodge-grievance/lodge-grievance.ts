@@ -9,7 +9,7 @@ import {
   CreateGrievanceRequest,
   UploadDocumentRequest,
 } from '../../../core/models/index';
-import { FileUploadResult } from '../../../shared/components/file-upload/file-upload';
+import { FileUploadResult } from '../../../shared/components/file-upload/index';
 
 @Component({
   selector: 'app-lodge-grievance',

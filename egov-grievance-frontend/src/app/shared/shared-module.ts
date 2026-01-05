@@ -13,6 +13,8 @@ import { MainLayoutComponent } from '../layouts/main-layout/main-layout.componen
 // Pipes
 import { StatusDisplayPipe } from './pipes/status-display-pipe';
 import { RoleDisplayPipe } from './pipes/role-display-pipe';
+import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog';
+import { FileUploadComponent } from './components/file-upload/file-upload';
 
 @NgModule({
   declarations: [
@@ -21,6 +23,8 @@ import { RoleDisplayPipe } from './pipes/role-display-pipe';
     MainLayoutComponent,
     StatusDisplayPipe,
     RoleDisplayPipe,
+    ConfirmDialogComponent,
+    FileUploadComponent,
   ],
   imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, MaterialModule],
   exports: [
@@ -34,6 +38,8 @@ import { RoleDisplayPipe } from './pipes/role-display-pipe';
     MainLayoutComponent,
     StatusDisplayPipe,
     RoleDisplayPipe,
+    ConfirmDialogComponent,
+    FileUploadComponent,
   ],
 })
 export class SharedModule {}

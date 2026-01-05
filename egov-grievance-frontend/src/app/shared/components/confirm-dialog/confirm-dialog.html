@@ -1,1 +1,21 @@
-<p>confirm-dialog works!</p>
+<h2 mat-dialog-title class="dialog-title" [ngClass]="data.type">
+  {{ data.title }}
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <p>{{ data.message }}</p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">
+    {{ data.cancelText || 'Cancel' }}
+  </button>
+
+  <button
+    mat-raised-button
+    color="{{ data.type === 'danger' ? 'warn' : 'primary' }}"
+    (click)="confirm()"
+  >
+    {{ data.confirmText || 'Confirm' }}
+  </button>
+</mat-dialog-actions>

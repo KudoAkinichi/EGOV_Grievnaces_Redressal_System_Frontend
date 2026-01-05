@@ -15,7 +15,7 @@ import {
 import {
   ConfirmDialogComponent,
   ConfirmDialogData,
-} from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+} from '../../../shared/components/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-grievance-details',

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import {
   CanActivate,
   CanActivateChild,
@@ -7,13 +7,16 @@ import {
   Router,
 } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { DISABLE_GUARDS } from './guard-bypass';
+import { Observable, of } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate, CanActivateChild {
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
     return this.checkAuth(state.url);
@@ -24,15 +27,13 @@ export class AuthGuard implements CanActivate, CanActivateChild {
   }
 
   private checkAuth(url: string): boolean {
-    if (DISABLE_GUARDS) {
-      return true; // ✅ allow all routes
+    // SSR safe
+    if (!isPlatformBrowser(this.platformId)) {
+      return true;
     }
 
+    // 🔥 KEY FIX: synchronous token check
     if (this.authService.isAuthenticated()) {
-      if (this.authService.isFirstLogin() && !url.includes('change-password')) {
-        this.router.navigate(['/auth/change-password']);
-        return false;
-      }
       return true;
     }
 

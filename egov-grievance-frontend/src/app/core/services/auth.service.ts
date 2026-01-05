@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, tap, catchError, of, map } from 'rxjs';
+import { BehaviorSubject, Observable, tap, catchError, of, map, switchMap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { StorageService } from './storage.service';
 import { TokenService } from './token.service';
@@ -47,12 +47,12 @@ export class AuthService {
    */
   private initializeAuthState(): void {
     const token = this.storageService.getToken();
+
     if (token && !this.tokenService.isTokenExpired(token)) {
       this.isAuthenticatedSubject.next(true);
-      // Load user data
       this.loadCurrentUser().subscribe();
     } else {
-      this.logout(false);
+      this.isAuthenticatedSubject.next(false);
     }
   }
 
@@ -72,16 +72,14 @@ export class AuthService {
         // Store token
         this.storageService.setToken(response.token);
 
-        // Extract and store user ID from token
+        // Store userId if present
         const userId = this.tokenService.getUserIdFromToken(response.token);
         if (userId) {
           this.storageService.setUserId(userId);
         }
 
+        // ✅ Only mark authenticated
         this.isAuthenticatedSubject.next(true);
-
-        // Load full user data
-        this.loadCurrentUser().subscribe();
       })
     );
   }
@@ -171,7 +169,14 @@ export class AuthService {
    */
   getCurrentUserRole(): UserRole | null {
     const user = this.getCurrentUser();
-    return user?.role || null;
+    if (user?.role) {
+      return user.role;
+    }
+
+    const token = this.storageService.getToken();
+    if (!token) return null;
+
+    return this.tokenService.getRoleFromToken(token);
   }
 
   /**

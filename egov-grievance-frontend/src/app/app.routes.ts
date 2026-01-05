@@ -6,54 +6,58 @@ import { UserRole } from './core/models/user.model';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
 
 export const routes: Routes = [
-  // 🔓 PUBLIC ROUTES (NO layout)
   {
     path: '',
     redirectTo: '/auth/login',
     pathMatch: 'full',
   },
 
+  // 🔓 AUTH
   {
     path: 'auth',
     canActivate: [NoAuthGuard],
     loadChildren: () => import('./features/auth/auth-module').then((m) => m.AuthModule),
   },
 
-  // 🔐 PROTECTED ROUTES (WITH layout)
+  // 🔐 PROTECTED AREA
   {
     path: '',
     component: MainLayoutComponent,
     canActivate: [AuthGuard],
     children: [
+      // ✅ CITIZEN
       {
         path: 'citizen',
-        canActivateChild: [RoleGuard],
-        data: { roles: [UserRole.CITIZEN] },
         loadChildren: () =>
           import('./features/citizen/citizen-module').then((m) => m.CitizenModule),
+        canActivate: [RoleGuard],
+        data: { roles: [UserRole.CITIZEN] },
       },
 
+      // ✅ OFFICER
       {
         path: 'officer',
-        canActivateChild: [RoleGuard],
-        data: { roles: [UserRole.DEPT_OFFICER] },
         loadChildren: () =>
           import('./features/officer/officer-module').then((m) => m.OfficerModule),
+        canActivate: [RoleGuard],
+        data: { roles: [UserRole.DEPT_OFFICER] },
       },
 
+      // ✅ SUPERVISOR
       {
         path: 'supervisor',
-        canActivateChild: [RoleGuard],
-        data: { roles: [UserRole.SUPERVISOR] },
         loadChildren: () =>
           import('./features/supervisor/supervisor-module').then((m) => m.SupervisorModule),
+        canActivate: [RoleGuard],
+        data: { roles: [UserRole.SUPERVISOR] },
       },
 
+      // ✅ ADMIN
       {
         path: 'admin',
-        canActivateChild: [RoleGuard],
-        data: { roles: [UserRole.ADMIN] },
         loadChildren: () => import('./features/admin/admin-module').then((m) => m.AdminModule),
+        canActivate: [RoleGuard],
+        data: { roles: [UserRole.ADMIN] },
       },
     ],
   },

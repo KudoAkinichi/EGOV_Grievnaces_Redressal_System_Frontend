@@ -59,22 +59,26 @@ export class LoginComponent implements OnInit {
         this.loading = false;
         this.toastr.success(response.message || 'Login successful!', 'Success');
 
-        // Handle first login
         if (response.isFirstLogin) {
           this.router.navigate(['/auth/change-password']);
-        } else {
-          // Redirect to role-based dashboard
-          const dashboardRoute = this.authService.getDashboardRoute();
-          if (this.returnUrl) {
-            this.router.navigateByUrl(this.returnUrl);
-          } else {
-            this.router.navigate([dashboardRoute]);
-          }
+          return;
         }
+
+        // 🔴 WAIT FOR USER TO LOAD
+        this.authService.loadCurrentUser().subscribe({
+          next: () => {
+            const dashboardRoute = this.authService.getDashboardRoute();
+            console.log('REDIRECTING TO:', dashboardRoute);
+            this.router.navigateByUrl(dashboardRoute);
+          },
+          error: () => {
+            this.toastr.error('Failed to load user details');
+          },
+        });
       },
       error: (error) => {
         this.loading = false;
-        this.toastr.error(error.error?.message || 'Login failed. Please try again.', 'Error');
+        this.toastr.error(error.error?.message || 'Login failed', 'Error');
       },
     });
   }

@@ -1,0 +1,18 @@
+.dialog-title {
+  &.warning {
+    color: #ff9800;
+  }
+
+  &.danger {
+    color: #f44336;
+  }
+
+  &.info {
+    color: #2196f3;
+  }
+}
+
+.dialog-content {
+  font-size: 0.95rem;
+  color: #555;
+}
