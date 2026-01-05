@@ -1,1 +1,71 @@
-<p>dashboard works!</p>
+<div class="dashboard-container">
+  <div class="welcome-section">
+    <h1>Welcome back, {{ userName }}!</h1>
+    <p>Manage and resolve assigned grievances</p>
+  </div>
+
+  <app-loader *ngIf="loading" message="Loading dashboard..."></app-loader>
+
+  <div *ngIf="!loading && stats">
+    <div class="quick-actions">
+      <button mat-raised-button color="primary" (click)="navigateToAssignedGrievances()">
+        <mat-icon>assignment_ind</mat-icon>
+        My Assigned Grievances
+      </button>
+      <button mat-raised-button color="accent" (click)="navigateToGrievances()">
+        <mat-icon>list</mat-icon>
+        All Grievances
+      </button>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card assigned-card">
+        <mat-icon class="stat-icon" style="color: #ff9800">assignment_ind</mat-icon>
+        <div class="stat-value">{{ stats.assignedToMe }}</div>
+        <div class="stat-label">Assigned to Me</div>
+      </div>
+
+      <div class="stat-card open-card">
+        <mat-icon class="stat-icon" style="color: #2196f3">pending_actions</mat-icon>
+        <div class="stat-value">{{ stats.openIssues }}</div>
+        <div class="stat-label">Open Issues</div>
+      </div>
+
+      <div class="stat-card review-card">
+        <mat-icon class="stat-icon" style="color: #ffeb3b">rate_review</mat-icon>
+        <div class="stat-value">{{ stats.inReview }}</div>
+        <div class="stat-label">In Review</div>
+      </div>
+
+      <div class="stat-card resolved-card">
+        <mat-icon class="stat-icon" style="color: #4caf50">check_circle</mat-icon>
+        <div class="stat-value">{{ stats.resolved }}</div>
+        <div class="stat-label">Resolved</div>
+      </div>
+
+      <div class="stat-card closed-card">
+        <mat-icon class="stat-icon" style="color: #9c27b0">done_all</mat-icon>
+        <div class="stat-value">{{ stats.closed }}</div>
+        <div class="stat-label">Closed</div>
+      </div>
+    </div>
+
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>info</mat-icon>
+          Quick Tips
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <ul>
+          <li>Review assigned grievances regularly</li>
+          <li>Update status to keep citizens informed</li>
+          <li>Add resolution remarks when resolving grievances</li>
+          <li>Upload supporting documents for resolutions</li>
+          <li>Respond to citizen comments promptly</li>
+        </ul>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

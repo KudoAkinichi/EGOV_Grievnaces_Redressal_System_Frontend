@@ -1,1 +1,208 @@
-<p>resolve-grievance works!</p>
+<div class="resolve-grievance-container">
+  <app-loader *ngIf="loading" message="Loading grievance..."></app-loader>
+
+  <div *ngIf="!loading && grievance">
+    <!-- Grievance Details Card -->
+    <mat-card class="details-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>assignment</mat-icon>
+          {{ grievance.grievanceNumber }}
+        </mat-card-title>
+        <app-status-badge [status]="grievance.status"></app-status-badge>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <label>Title:</label>
+            <p>{{ grievance.title }}</p>
+          </div>
+          <div class="detail-item">
+            <label>Description:</label>
+            <p>{{ grievance.description }}</p>
+          </div>
+          <div class="detail-item">
+            <label>Department:</label>
+            <p>{{ grievance.departmentName || 'N/A' }}</p>
+          </div>
+          <div class="detail-item">
+            <label>Category:</label>
+            <p>{{ grievance.categoryName || 'N/A' }}</p>
+          </div>
+          <div class="detail-item">
+            <label>Priority:</label>
+            <mat-chip [class]="'priority-' + grievance.priority.toLowerCase()">
+              {{ grievance.priority }}
+            </mat-chip>
+          </div>
+          <div class="detail-item">
+            <label>Created On:</label>
+            <p>{{ grievance.createdAt | date : 'medium' }}</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Documents -->
+    <mat-card class="documents-card" *ngIf="documents.length > 0">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>attach_file</mat-icon>
+          Supporting Documents
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-list>
+          <mat-list-item *ngFor="let doc of documents">
+            <mat-icon matListItemIcon>{{
+              doc.fileType.includes('image') ? 'image' : 'description'
+            }}</mat-icon>
+            <div matListItemTitle>{{ doc.fileName }}</div>
+            <div matListItemLine>Uploaded by {{ doc.uploadedByRole }}</div>
+            <button mat-icon-button matListItemMeta (click)="downloadDocument(doc)">
+              <mat-icon>download</mat-icon>
+            </button>
+          </mat-list-item>
+        </mat-list>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Status History -->
+    <mat-card class="history-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>history</mat-icon>
+          Status History
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-accordion>
+          <mat-expansion-panel
+            *ngFor="let history of statusHistory; let i = index"
+            [expanded]="i === 0"
+          >
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <app-status-badge [status]="history.newStatus"></app-status-badge>
+              </mat-panel-title>
+              <mat-panel-description>
+                {{ history.createdAt | date : 'medium' }}
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <div class="history-content">
+              <p><strong>Remarks:</strong> {{ history.remarks || 'No remarks' }}</p>
+              <p><strong>Changed by:</strong> User ID {{ history.changedBy }}</p>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Comments Section -->
+    <mat-card class="comments-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>comment</mat-icon>
+          Comments
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="comments-list" *ngIf="comments.length > 0">
+          <div *ngFor="let comment of comments" class="comment-item">
+            <div class="comment-header">
+              <mat-chip>{{ comment.senderRole }}</mat-chip>
+              <span class="comment-time">{{ comment.createdAt | date : 'short' }}</span>
+            </div>
+            <p class="comment-message">{{ comment.message }}</p>
+          </div>
+        </div>
+
+        <div class="add-comment-section">
+          <h4>Add Comment</h4>
+          <form [formGroup]="commentForm" (ngSubmit)="addComment()">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Your Comment</mat-label>
+              <textarea matInput formControlName="message" rows="3"></textarea>
+              <mat-error *ngIf="commentForm.get('message')?.hasError('required')">
+                Comment is required
+              </mat-error>
+            </mat-form-field>
+            <button mat-raised-button color="primary" type="submit" [disabled]="addingComment">
+              <span *ngIf="!addingComment">Add Comment</span>
+              <mat-spinner diameter="20" *ngIf="addingComment"></mat-spinner>
+            </button>
+          </form>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Resolution Form -->
+    <mat-card class="resolution-card" *ngIf="canUpdateStatus()">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>task_alt</mat-icon>
+          Update Status & Resolution
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="resolutionForm" (ngSubmit)="onSubmit()">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Update Status</mat-label>
+            <mat-select formControlName="status">
+              <mat-option *ngFor="let status of availableStatuses" [value]="status.value">
+                {{ status.label }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="f['status'].hasError('required')">Status is required</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Resolution Remarks</mat-label>
+            <textarea
+              matInput
+              formControlName="remarks"
+              rows="5"
+              placeholder="Provide details about the actions taken or resolution"
+            >
+            </textarea>
+            <mat-hint>Minimum 10 characters</mat-hint>
+            <mat-error *ngIf="f['remarks'].hasError('minlength')">
+              Minimum 10 characters required
+            </mat-error>
+          </mat-form-field>
+
+          <div class="file-upload-section">
+            <h4>Upload Resolution Documents (Optional)</h4>
+            <app-file-upload [multiple]="true" (fileSelected)="onFilesSelected($event)">
+            </app-file-upload>
+          </div>
+
+          <div class="form-actions">
+            <button mat-button type="button" (click)="onCancel()" [disabled]="submitting">
+              Cancel
+            </button>
+            <button
+              mat-raised-button
+              color="primary"
+              type="submit"
+              [disabled]="submitting || resolutionForm.invalid"
+            >
+              <span *ngIf="!submitting">
+                <mat-icon>send</mat-icon>
+                Update Grievance
+              </span>
+              <mat-spinner diameter="20" *ngIf="submitting"></mat-spinner>
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="info-card" *ngIf="!canUpdateStatus()">
+      <mat-card-content>
+        <mat-icon>info</mat-icon>
+        <p>This grievance is {{ grievance.status | statusDisplay }} and cannot be updated.</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
