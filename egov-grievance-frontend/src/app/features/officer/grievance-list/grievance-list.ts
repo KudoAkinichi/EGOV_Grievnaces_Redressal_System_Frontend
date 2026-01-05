@@ -68,20 +68,20 @@ export class GrievanceListComponent implements OnInit, AfterViewInit {
   loadGrievances(): void {
     this.loading = true;
 
-    this.officerService.getGrievanceComments(0).subscribe({
-      next: (response: any) => {
-        if (response.success && response.data) {
-          this.allGrievances = response.data;
-          this.loadAssignedGrievances();
-          this.applyFilter();
-        }
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Error loading grievances:', error);
-        this.loading = false;
-      },
-    });
+    this.officerService
+      .getAllGrievances(this.selectedFilter === 'assigned' ? 'ASSIGNED' : this.selectedFilter)
+      .subscribe({
+        next: (response) => {
+          if (response.success && response.data?.content) {
+            this.allGrievances = response.data.content;
+            this.dataSource.data = this.allGrievances;
+          }
+          this.loading = false;
+        },
+        error: () => {
+          this.loading = false;
+        },
+      });
   }
 
   loadAssignedGrievances(): void {
@@ -114,5 +114,9 @@ export class GrievanceListComponent implements OnInit, AfterViewInit {
 
   viewDetails(grievanceId: number): void {
     this.router.navigate(['/officer/resolve', grievanceId]);
+  }
+
+  isAssignedToMe(grievance: Grievance): boolean {
+    return grievance.assignedOfficerId === this.officerId;
   }
 }

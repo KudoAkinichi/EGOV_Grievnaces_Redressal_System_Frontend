@@ -13,7 +13,7 @@ import {
   GrievanceDocument,
   StatusHistory,
   GrievanceComment,
-} from '../../../core/models/index';
+} from '../../../core/models';
 
 @Injectable({
   providedIn: 'root',
@@ -22,17 +22,33 @@ export class OfficerGrievanceService {
   private readonly GRIEVANCE_URL = `${environment.apiUrl}/grievances`;
 
   constructor(private http: HttpClient) {}
+
+  // ================= DASHBOARD =================
+
   getOfficerDashboard(officerId: number): Observable<ApiResponse<OfficerDashboardStats>> {
     const params = new HttpParams().set('officerId', officerId.toString());
+
     return this.http.get<ApiResponse<OfficerDashboardStats>>(
       `${this.GRIEVANCE_URL}/dashboard/officer`,
       { params }
     );
   }
 
-  getAssignedGrievances(): Observable<ApiResponse<Grievance[]>> {
-    return this.http.get<ApiResponse<Grievance[]>>(`${this.GRIEVANCE_URL}/assigned`);
+  // ================= GRIEVANCE LIST (IMPORTANT) =================
+  // Backend has NO /assigned endpoint
+  // So we fetch all grievances and filter by assignedOfficerId in frontend
+
+  getAllGrievances(status?: string, page = 0, size = 20): Observable<ApiResponse<any>> {
+    let params = new HttpParams().set('page', page).set('size', size);
+
+    if (status && status !== 'all') {
+      params = params.set('status', status);
+    }
+
+    return this.http.get<ApiResponse<any>>(`${this.GRIEVANCE_URL}`, { params });
   }
+
+  // ================= SINGLE GRIEVANCE =================
 
   getGrievanceById(id: number): Observable<ApiResponse<Grievance>> {
     return this.http.get<ApiResponse<Grievance>>(`${this.GRIEVANCE_URL}/${id}`);
@@ -50,8 +66,8 @@ export class OfficerGrievanceService {
   uploadDocument(
     grievanceId: number,
     request: UploadDocumentRequest
-  ): Observable<ApiResponse<GrievanceDocument>> {
-    return this.http.post<ApiResponse<GrievanceDocument>>(
+  ): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(
       `${this.GRIEVANCE_URL}/${grievanceId}/documents`,
       request
     );

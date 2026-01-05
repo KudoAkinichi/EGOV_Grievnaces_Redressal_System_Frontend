@@ -18,8 +18,18 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-    return this.checkAuth(state.url);
+  canActivate(): boolean {
+    if (!isPlatformBrowser(this.platformId)) {
+      return true;
+    }
+
+    const token = this.authService.getCurrentUserRole(); // triggers storage read safely
+    if (token) {
+      return true;
+    }
+
+    this.router.navigate(['/auth/login']);
+    return false;
   }
 
   canActivateChild(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
