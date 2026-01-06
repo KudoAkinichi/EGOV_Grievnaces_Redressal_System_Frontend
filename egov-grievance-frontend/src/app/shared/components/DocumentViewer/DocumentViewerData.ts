@@ -83,6 +83,7 @@ export interface DocumentViewerData {
           margin: 0;
           font-size: 18px;
           color: #333;
+          word-break: break-word;
         }
       }
 
