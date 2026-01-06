@@ -55,41 +55,6 @@
       </div>
     </div>
 
-    <!-- Status Breakdown -->
-    <mat-card class="status-breakdown-card">
-      <mat-card-header>
-        <mat-card-title>Status Breakdown</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="status-list">
-          <div class="status-item">
-            <app-status-badge [status]="'SUBMITTED'"></app-status-badge>
-            <span class="status-count">{{ stats.submitted }}</span>
-          </div>
-          <div class="status-item">
-            <app-status-badge [status]="'ASSIGNED'"></app-status-badge>
-            <span class="status-count">{{ stats.assigned }}</span>
-          </div>
-          <div class="status-item">
-            <app-status-badge [status]="'IN_REVIEW'"></app-status-badge>
-            <span class="status-count">{{ stats.inReview }}</span>
-          </div>
-          <div class="status-item">
-            <app-status-badge [status]="'RESOLVED'"></app-status-badge>
-            <span class="status-count">{{ stats.resolved }}</span>
-          </div>
-          <div class="status-item">
-            <app-status-badge [status]="'CLOSED'"></app-status-badge>
-            <span class="status-count">{{ stats.closed }}</span>
-          </div>
-          <div class="status-item" *ngIf="stats.escalated > 0">
-            <app-status-badge [status]="'ESCALATED'"></app-status-badge>
-            <span class="status-count">{{ stats.escalated }}</span>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
     <!-- Recent Grievances -->
     <mat-card class="recent-grievances-card">
       <mat-card-header>
