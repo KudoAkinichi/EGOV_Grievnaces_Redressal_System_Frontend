@@ -1,52 +1,44 @@
-<div class="dashboard-container">
-  <div class="welcome-section">
-    <h1>Supervisor Dashboard</h1>
-    <p>Monitor and manage department grievances</p>
+<!-- Optional: Show all stats (in addition to existing 3 blocks) -->
+<div class="stats-grid">
+  <!-- Total Grievances -->
+  <div class="stat-card">
+    <div class="stat-icon">📋</div>
+    <div class="stat-value">{{ totalGrievances }}</div>
+    <div class="stat-label">TOTAL GRIEVANCES</div>
   </div>
 
-  <app-loader *ngIf="loading" message="Loading dashboard..."></app-loader>
-
-  <div class="quick-actions">
-    <button mat-raised-button color="primary" routerLink="/supervisor/grievances">
-      <mat-icon>list_alt</mat-icon>
-      All Grievances
-    </button>
-
-    <button mat-raised-button color="warn" routerLink="/supervisor/escalations">
-      <mat-icon>priority_high</mat-icon>
-      Escalations
-    </button>
+  <!-- Escalated -->
+  <div class="stat-card">
+    <div class="stat-icon">⚠️</div>
+    <div class="stat-value">{{ escalatedCount }}</div>
+    <div class="stat-label">ESCALATED</div>
   </div>
 
-  <div class="stats-grid">
-    <div class="stat-card">
-      <mat-icon class="stat-icon primary">assignment</mat-icon>
-      <div class="stat-value">{{ totalGrievances }}</div>
-      <div class="stat-label">Total Grievances</div>
-    </div>
-
-    <div class="stat-card">
-      <mat-icon class="stat-icon warn">priority_high</mat-icon>
-      <div class="stat-value">{{ escalatedCount }}</div>
-      <div class="stat-label">Escalated</div>
-    </div>
-
-    <div class="stat-card">
-      <mat-icon class="stat-icon success">check_circle</mat-icon>
-      <div class="stat-value">{{ resolvedCount }}</div>
-      <div class="stat-label">Resolved</div>
-    </div>
+  <!-- Assigned -->
+  <div class="stat-card">
+    <div class="stat-icon">👤</div>
+    <div class="stat-value">{{ assignedCount }}</div>
+    <div class="stat-label">ASSIGNED</div>
   </div>
 
-  <mat-card class="info-card">
-    <mat-card-title>Supervisor Responsibilities</mat-card-title>
-    <mat-card-content>
-      <ul>
-        <li>Monitor all department grievances</li>
-        <li>Handle escalated cases</li>
-        <li>Assign or reassign grievances</li>
-        <li>Ensure timely resolution</li>
-      </ul>
-    </mat-card-content>
-  </mat-card>
+  <!-- In Review -->
+  <div class="stat-card">
+    <div class="stat-icon">🔍</div>
+    <div class="stat-value">{{ inReviewCount }}</div>
+    <div class="stat-label">IN REVIEW</div>
+  </div>
+
+  <!-- Resolved -->
+  <div class="stat-card">
+    <div class="stat-icon">✅</div>
+    <div class="stat-value">{{ resolvedCount }}</div>
+    <div class="stat-label">RESOLVED</div>
+  </div>
+
+  <!-- Open Issues -->
+  <div class="stat-card">
+    <div class="stat-icon">🔴</div>
+    <div class="stat-value">{{ openIssuesCount }}</div>
+    <div class="stat-label">OPEN ISSUES</div>
+  </div>
 </div>
