@@ -1,1 +1,67 @@
-<p>dashboard works!</p>
+<!-- src/app/features/admin/dashboard/dashboard.component.html -->
+<div class="dashboard-container">
+  <div class="welcome-section">
+    <h1>Admin Dashboard</h1>
+    <p>System administration and management</p>
+  </div>
+
+  <div class="quick-actions">
+    <button mat-raised-button color="primary" (click)="navigateTo('departments')">
+      <mat-icon>business</mat-icon>
+      Departments
+    </button>
+    <button mat-raised-button color="primary" (click)="navigateTo('users')">
+      <mat-icon>people</mat-icon>
+      Users
+    </button>
+    <button mat-raised-button color="accent" (click)="navigateTo('create-officer')">
+      <mat-icon>person_add</mat-icon>
+      Create Officer
+    </button>
+    <button mat-raised-button (click)="navigateTo('reports')">
+      <mat-icon>assessment</mat-icon>
+      Reports
+    </button>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <mat-icon class="stat-icon">people</mat-icon>
+      <div class="stat-value">{{ totalUsers }}</div>
+      <div class="stat-label">Total Users</div>
+    </div>
+
+    <div class="stat-card">
+      <mat-icon class="stat-icon">business</mat-icon>
+      <div class="stat-value">{{ totalDepartments }}</div>
+      <div class="stat-label">Departments</div>
+    </div>
+
+    <div class="stat-card">
+      <mat-icon class="stat-icon">assignment</mat-icon>
+      <div class="stat-value">{{ totalGrievances }}</div>
+      <div class="stat-label">Total Grievances</div>
+    </div>
+
+    <div class="stat-card">
+      <mat-icon class="stat-icon">badge</mat-icon>
+      <div class="stat-value">{{ activeOfficers }}</div>
+      <div class="stat-label">Active Officers</div>
+    </div>
+  </div>
+
+  <mat-card class="info-card">
+    <mat-card-header>
+      <mat-card-title>Admin Responsibilities</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <ul>
+        <li>Manage departments and categories</li>
+        <li>Create and manage user accounts</li>
+        <li>Assign roles and departments</li>
+        <li>Monitor system performance</li>
+        <li>Generate reports and analytics</li>
+      </ul>
+    </mat-card-content>
+  </mat-card>
+</div>
