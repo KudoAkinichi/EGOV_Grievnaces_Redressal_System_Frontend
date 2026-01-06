@@ -235,7 +235,11 @@ export class GrievanceDetailsComponent implements OnInit {
   }
 
   downloadDocument(doc: GrievanceDocument): void {
-    this.grievanceService.downloadDocument(doc);
+    const linkSource = `data:${doc.fileType};base64,${doc.fileDataBase64}`;
+    const link = document.createElement('a');
+    link.href = linkSource;
+    link.download = doc.fileName;
+    link.click();
   }
 
   viewDocument(doc: GrievanceDocument): void {

@@ -2,6 +2,7 @@ import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
+import { MatDialog } from '@angular/material/dialog';
 import { environment } from '../../../environments/environment';
 import {
   ApiResponse,
@@ -19,6 +20,7 @@ import {
   Category,
   GrievanceStatus,
 } from '../../core/models/index';
+import { DocumentViewerComponent } from '../../shared/components/DocumentViewer/DocumentViewerData';
 
 @Injectable({
   providedIn: 'root',
@@ -27,7 +29,11 @@ export class GrievanceService {
   private readonly GRIEVANCE_URL = `${environment.apiUrl}/grievances`;
   private readonly DEPARTMENT_URL = `${environment.apiUrl}/departments`;
 
-  constructor(private http: HttpClient, @Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(
+    private http: HttpClient,
+    private dialog: MatDialog,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
 
   // ================= Grievance CRUD =================
 
@@ -149,10 +155,17 @@ export class GrievanceService {
 
   // ================= Utilities (SSR SAFE) =================
 
-  downloadDocument(doc: GrievanceDocument): void {
-    if (!isPlatformBrowser(this.platformId)) return;
+  viewDocument(doc: GrievanceDocument): void {
+    this.dialog.open(DocumentViewerComponent, {
+      data: { document: doc },
+      width: '90vw',
+      height: '90vh',
+      maxWidth: '1200px',
+    });
+  }
 
-    const linkSource = `data:${doc.fileType};base64,${doc.fileData}`;
+  downloadDocument(doc: GrievanceDocument): void {
+    const linkSource = `data:${doc.fileType};base64,${doc.fileDataBase64}`;
     const link = document.createElement('a');
     link.href = linkSource;
     link.download = doc.fileName;
@@ -161,7 +174,7 @@ export class GrievanceService {
 
   getDocumentPreviewUrl(doc: GrievanceDocument): string {
     if (!isPlatformBrowser(this.platformId)) return '';
-    return `data:${doc.fileType};base64,${doc.fileData}`;
+    return `data:${doc.fileType};base64,${doc.fileDataBase64}`;
   }
 
   isImageFile(fileType: string): boolean {

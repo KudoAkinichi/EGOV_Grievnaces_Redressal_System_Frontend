@@ -6,7 +6,7 @@ export interface GrievanceDocument {
   fileName: string;
   fileType: string;
   fileSize: number;
-  fileData: string; // Base64
+  fileDataBase64: string; // Changed from fileData to fileDataBase64
   uploadedBy: number;
   uploadedByRole: UserRole;
   createdAt: string;

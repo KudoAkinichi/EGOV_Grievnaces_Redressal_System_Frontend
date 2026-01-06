@@ -232,7 +232,7 @@ export class ResolveGrievanceComponent implements OnInit {
   }
 
   downloadDocument(doc: GrievanceDocument): void {
-    const linkSource = `data:${doc.fileType};base64,${doc.fileData}`;
+    const linkSource = `data:${doc.fileType};base64,${doc.fileDataBase64}`;
     const downloadLink = document.createElement('a');
     downloadLink.href = linkSource;
     downloadLink.download = doc.fileName;
