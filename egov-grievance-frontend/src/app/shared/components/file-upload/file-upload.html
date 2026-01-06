@@ -1,21 +1,39 @@
 <div class="file-upload">
-  <input type="file" id="fileInput" hidden (change)="onFileChange($event)" />
+  <input
+    type="file"
+    id="fileInput"
+    hidden
+    [multiple]="multiple"
+    [accept]="accept"
+    (change)="onFileChange($event)"
+    #fileInputRef
+  />
 
-  <button mat-stroked-button color="primary" (click)="fileInput.click()" #fileInput>
+  <button mat-stroked-button color="primary" (click)="fileInputRef.click()">
     <mat-icon>upload</mat-icon>
-    Upload Document
+    {{ multiple ? 'Upload Documents' : 'Upload Document' }}
   </button>
 
-  <div class="file-info" *ngIf="selectedFile">
-    <mat-icon color="primary">description</mat-icon>
-    <span>{{ selectedFile.fileName }}</span>
+  <!-- Display uploaded files -->
+  <div class="uploaded-files" *ngIf="selectedFiles.length > 0">
+    <mat-list>
+      <mat-list-item *ngFor="let file of selectedFiles; let i = index">
+        <mat-icon matListItemIcon color="primary">description</mat-icon>
+        <div matListItemTitle>{{ file.fileName }}</div>
+        <div matListItemLine>{{ (file.fileSize / 1024).toFixed(2) }} KB</div>
+        <button mat-icon-button color="warn" (click)="removeFile(i)" matListItemMeta>
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-list-item>
+    </mat-list>
 
-    <button mat-icon-button color="warn" (click)="removeFile()">
-      <mat-icon>close</mat-icon>
+    <button mat-button color="warn" (click)="clearAll()" *ngIf="selectedFiles.length > 1">
+      <mat-icon>delete_sweep</mat-icon>
+      Clear All
     </button>
   </div>
 
-  <mat-error *ngIf="errorMessage">
+  <mat-error *ngIf="errorMessage" class="error-message">
     {{ errorMessage }}
   </mat-error>
 </div>
