@@ -1,5 +1,6 @@
 // ================= API / COMMON =================
 export * from './api-response.model';
+export * from './page.model';
 
 // ================= USER & AUTH =================
 export * from './user.model';

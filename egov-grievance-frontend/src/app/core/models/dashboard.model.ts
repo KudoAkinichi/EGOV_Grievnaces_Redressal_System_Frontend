@@ -1,3 +1,4 @@
+// src/app/core/models/dashboard.model.ts
 export interface OfficerDashboardStats {
   totalGrievances?: number;
   openIssues: number;
@@ -20,14 +21,16 @@ export interface CitizenDashboardStats {
   escalated: number;
 }
 
+// ✅ Fixed: Added missing properties
 export interface SupervisorDashboardStats {
-  totalGrievances: number;
-  openIssues: number;
-  inReview: number;
-  resolved: number;
+  total: number; // renamed from totalGrievances for consistency
   escalated: number;
-  pendingAssignment: number;
-  departmentPerformance: {
+  resolved: number;
+  assigned: number; // ✅ Added
+  inReview: number; // ✅ Added
+  openIssues: number; // ✅ Added
+  pendingAssignment?: number;
+  departmentPerformance?: {
     averageResolutionTime: number;
     resolvedToday: number;
     resolvedThisWeek: number;

@@ -1,55 +1,68 @@
-import { Injectable } from '@angular/core';
-import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
-import { Observable } from 'rxjs';
+// src/app/core/interceptors/jwt-interceptor.ts
+import { Injectable, inject } from '@angular/core';
+import { HttpInterceptorFn } from '@angular/common/http';
 import { StorageService } from '../services/storage.service';
 import { AuthService } from '../services/auth.service';
 
-@Injectable()
-export class JwtInterceptor implements HttpInterceptor {
-  constructor(private storageService: StorageService, private authService: AuthService) {}
+export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
+  const storageService = inject(StorageService);
+  const authService = inject(AuthService);
 
-  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    // Skip interceptor for auth endpoints
-    const isAuthEndpoint =
-      request.url.includes('/auth/login') || request.url.includes('/auth/register');
+  // Skip interceptor for auth endpoints
+  const isAuthEndpoint =
+    req.url.includes('/auth/login') ||
+    req.url.includes('/auth/register') ||
+    req.url.includes('/auth/logout');
 
-    if (isAuthEndpoint) {
-      return next.handle(request);
-    }
+  if (isAuthEndpoint) {
+    return next(req);
+  }
 
-    // Get token and user ID from storage
-    const token = this.storageService.getToken();
-    const userId = this.storageService.getUserId();
-    const user = this.authService.getCurrentUser();
+  // Get token and user info
+  const token = storageService.getToken();
+  const userId = storageService.getUserId();
+  const user = authService.getCurrentUser();
 
-    // Clone request and add headers
-    if (token) {
-      request = request.clone({
+  // Clone request and add headers
+  if (token) {
+    let clonedReq = req.clone({
+      setHeaders: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    // Add X-User-Id header
+    if (userId) {
+      clonedReq = clonedReq.clone({
         setHeaders: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          'X-User-Id': userId.toString(),
         },
       });
-
-      // Add X-User-Id header if available
-      if (userId) {
-        request = request.clone({
-          setHeaders: {
-            'X-User-Id': userId.toString(),
-          },
-        });
-      }
-
-      // Add X-User-Role header if available
-      if (user?.role) {
-        request = request.clone({
-          setHeaders: {
-            'X-User-Role': user.role,
-          },
-        });
-      }
     }
 
-    return next.handle(request);
+    // Add X-User-Role header
+    if (user?.role) {
+      clonedReq = clonedReq.clone({
+        setHeaders: {
+          'X-User-Role': user.role,
+        },
+      });
+    }
+
+    // ✅ Add X-Department-ID header for supervisor
+    if (user?.departmentId) {
+      clonedReq = clonedReq.clone({
+        setHeaders: {
+          'X-Department-ID': user.departmentId.toString(),
+        },
+      });
+    }
+
+    console.log('✅ JWT Interceptor - Added headers');
+
+    return next(clonedReq);
   }
-}
+
+  return next(req);
+};

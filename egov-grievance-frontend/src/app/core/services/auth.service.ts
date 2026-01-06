@@ -1,8 +1,8 @@
 // src/app/core/services/auth.service.ts
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, tap, catchError, of, map } from 'rxjs';
+import { BehaviorSubject, Observable, tap, catchError, of, map, timeout, finalize } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { StorageService } from './storage.service';
 import { TokenService } from './token.service';
@@ -35,8 +35,9 @@ export class AuthService {
     private router: Router,
     private storageService: StorageService,
     private tokenService: TokenService,
-    @Inject(PLATFORM_ID) platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
+    // ✅ Initialize isBrowser property
     this.isBrowser = isPlatformBrowser(platformId);
 
     if (this.isBrowser) {
@@ -46,15 +47,35 @@ export class AuthService {
 
   /**
    * Initialize authentication state (BROWSER ONLY)
+   * Restores session on app reload - TOKEN STAYS IN LOCALSTORAGE
    */
   private initializeAuthState(): void {
     const token = this.storageService.getToken();
+    const storedUser = this.storageService.getUser<User>();
 
     if (token && !this.tokenService.isTokenExpired(token)) {
+      console.log('✅ Valid token found in localStorage, restoring session');
       this.isAuthenticatedSubject.next(true);
-      this.loadCurrentUser().subscribe();
+
+      // ✅ Restore user immediately from storage if available
+      if (storedUser) {
+        this.currentUserSubject.next(storedUser);
+      }
+
+      // Then refresh user data from server in background (non-blocking)
+      this.loadCurrentUser().subscribe({
+        error: (err) => {
+          console.warn('⚠️ Failed to refresh user data on init:', err.message);
+          // Keep the stored user even if refresh fails - session continues
+        },
+      });
+    } else if (token && this.tokenService.isTokenExpired(token)) {
+      console.log('⚠️ Token expired, clearing session');
+      this.clearAuthState(false); // Don't navigate, just clear state
     } else {
+      console.log('ℹ️ No token found');
       this.isAuthenticatedSubject.next(false);
+      this.currentUserSubject.next(null);
     }
   }
 
@@ -62,7 +83,9 @@ export class AuthService {
    * ✅ SSR SAFE TOKEN ACCESS
    */
   getToken(): string | null {
-    if (!this.isBrowser) return null;
+    if (!this.isBrowser) {
+      return null;
+    }
     return this.storageService.getToken();
   }
 
@@ -79,6 +102,7 @@ export class AuthService {
   login(request: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.AUTH_URL}/login`, request).pipe(
       tap((response) => {
+        // ✅ Store token in localStorage (persists on reload)
         this.storageService.setToken(response.token);
 
         const userId = this.tokenService.getUserIdFromToken(response.token);
@@ -87,35 +111,68 @@ export class AuthService {
         }
 
         this.isAuthenticatedSubject.next(true);
+        console.log('✅ Login successful, token stored in localStorage');
+      }),
+      catchError((error) => {
+        console.error('❌ Login failed:', error.message);
+        throw error;
       })
     );
   }
 
   /**
-   * Logout user
+   * ⚠️ ONLY CLEARS TOKEN ON EXPLICIT LOGOUT BUTTON CLICK
+   * Routes user back to login/signup page
    */
   logout(navigate: boolean = true): void {
     const token = this.getToken();
 
+    console.log('🔴 Logout initiated, clearing token from localStorage');
+
     if (token) {
-      this.http.post(`${this.AUTH_URL}/logout`, {}).subscribe({
-        complete: () => this.clearAuthState(navigate),
-        error: () => this.clearAuthState(navigate),
-      });
+      // Try to notify server but use timeout to avoid waiting
+      // If server is slow or returns 403, don't block logout
+      this.http
+        .post(`${this.AUTH_URL}/logout`, {})
+        .pipe(
+          timeout(5000), // Wait max 5 seconds
+          catchError((error) => {
+            // Log error but don't throw - logout should proceed regardless
+            if (error instanceof HttpErrorResponse && error.status === 403) {
+              console.warn('⚠️ Server returned 403 on logout endpoint (likely already logged out)');
+            } else {
+              console.warn('⚠️ Logout notification failed:', error.message);
+            }
+            return of(null); // Continue with local logout
+          })
+        )
+        .subscribe(() => {
+          this.clearAuthState(navigate);
+        });
     } else {
+      // No token, just clear state and redirect
       this.clearAuthState(navigate);
     }
   }
 
+  /**
+   * Clears all auth state from memory and localStorage
+   * Routes to login if navigate = true
+   */
   private clearAuthState(navigate: boolean): void {
+    // ✅ Clear from localStorage ONLY
     if (this.isBrowser) {
       this.storageService.clearAll();
+      console.log('✅ localStorage cleared');
     }
 
+    // Clear from memory
     this.currentUserSubject.next(null);
     this.isAuthenticatedSubject.next(false);
 
+    // Navigate to auth page if requested
     if (navigate) {
+      console.log('🔄 Navigating to login page');
       this.router.navigate(['/auth/login']);
     }
   }
@@ -137,11 +194,13 @@ export class AuthService {
         if (res.success && res.data && this.isBrowser) {
           this.storageService.setUser(res.data);
           this.currentUserSubject.next(res.data);
+          console.log('✅ User data loaded:', res.data.email);
         }
       }),
       map((res) => res.data),
-      catchError(() => {
-        this.logout(false);
+      catchError((err) => {
+        console.error('❌ Failed to load user data:', err);
+        // Don't logout on loadCurrentUser failure - just return null
         return of(null as any);
       })
     );

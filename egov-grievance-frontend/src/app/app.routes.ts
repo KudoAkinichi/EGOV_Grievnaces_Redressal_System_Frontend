@@ -30,8 +30,7 @@ export const routes: Routes = [
         path: 'citizen',
         loadChildren: () =>
           import('./features/citizen/citizen-module').then((m) => m.CitizenModule),
-        canActivate: [roleGuard],
-        data: { roles: [UserRole.CITIZEN] },
+        canActivate: [roleGuard(['CITIZEN'])],
       },
 
       // ✅ OFFICER
@@ -39,25 +38,22 @@ export const routes: Routes = [
         path: 'officer',
         loadChildren: () =>
           import('./features/officer/officer-module').then((m) => m.OfficerModule),
-        canActivate: [roleGuard],
-        data: { roles: [UserRole.DEPT_OFFICER] },
+        canActivate: [roleGuard(['DEPT_OFFICER'])],
       },
 
-      // ✅ SUPERVISOR
-
+      // ✅ SUPERVISOR (FIXED)
       {
         path: 'supervisor',
-        canActivate: [roleGuard(['SUPERVISOR'])],
         loadChildren: () =>
           import('./features/supervisor/supervisor-module').then((m) => m.SupervisorModule),
+        canActivate: [roleGuard(['SUPERVISOR'])],
       },
 
       // ✅ ADMIN
       {
         path: 'admin',
         loadChildren: () => import('./features/admin/admin-module').then((m) => m.AdminModule),
-        canActivate: [roleGuard],
-        data: { roles: [UserRole.ADMIN] },
+        canActivate: [roleGuard(['ADMIN'])],
       },
     ],
   },

@@ -1,4 +1,4 @@
-// src/app/features/supervisor/assign-grievance/assign-grievance.component.ts
+// src/app/features/supervisor/assign-grievance/assign-grievance.ts
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -15,9 +15,10 @@ import { Grievance, User } from '../../../core/models/index';
 export class AssignGrievanceComponent implements OnInit {
   assignForm!: FormGroup;
   grievanceId!: number;
-  grievance?: Grievance;
+  grievance: Grievance | null = null; // ✅ Changed from ? to null
   officers: User[] = [];
   loading = false;
+  loadingOfficers = false;
 
   constructor(
     private fb: FormBuilder,
@@ -35,72 +36,104 @@ export class AssignGrievanceComponent implements OnInit {
     });
 
     this.loadGrievance();
-    this.loadOfficers();
   }
 
+  /**
+   * Load grievance details and then load officers
+   */
   loadGrievance(): void {
+    this.loading = true;
+    console.log(`📥 Loading grievance: ${this.grievanceId}`);
+
     this.supervisorService.getGrievanceById(this.grievanceId).subscribe({
       next: (res) => {
+        console.log('✅ Grievance loaded:', res.data);
         if (res.success && res.data) {
           this.grievance = res.data;
+          // Load officers after grievance is loaded
+          this.loadOfficers();
         }
+        this.loading = false;
       },
-      error: () => {
+      error: (err) => {
+        console.error('❌ Failed to load grievance:', err);
         this.toastr.error('Failed to load grievance');
+        this.loading = false;
       },
     });
   }
 
+  /**
+   * Load officers for the grievance's department
+   */
   loadOfficers(): void {
     if (!this.grievance?.departmentId) {
-      // fallback: fetch grievance first
-      this.supervisorService.getGrievanceById(this.grievanceId).subscribe({
-        next: (res) => {
-          if (res.success && res.data?.departmentId) {
-            this.fetchOfficers(res.data.departmentId);
-          }
-        },
-      });
+      console.warn('⚠️ No department ID available');
+      this.toastr.error('No department assigned to this grievance');
       return;
     }
 
-    this.fetchOfficers(this.grievance.departmentId);
-  }
+    this.loadingOfficers = true;
+    console.log(`📥 Loading officers for department: ${this.grievance.departmentId}`);
 
-  fetchOfficers(departmentId: number): void {
-    this.supervisorService.getDepartmentOfficers(departmentId).subscribe({
+    this.supervisorService.getDepartmentOfficers(this.grievance.departmentId).subscribe({
       next: (res) => {
+        console.log('✅ Officers loaded:', res.data);
         if (res.success && res.data) {
           this.officers = res.data;
+          console.log(`Found ${this.officers.length} officers`);
         }
+        this.loadingOfficers = false;
       },
-      error: () => {
+      error: (err) => {
+        console.error('❌ Failed to load officers:', err);
         this.toastr.error('Failed to load officers');
+        this.loadingOfficers = false;
       },
     });
   }
 
+  /**
+   * Assign grievance to selected officer
+   */
   onSubmit(): void {
-    if (this.assignForm.invalid) return;
+    if (this.assignForm.invalid) {
+      this.toastr.error('Please select an officer');
+      return;
+    }
+
+    const officerId = this.assignForm.value.officerId;
+    console.log(`📤 Assigning grievance ${this.grievanceId} to officer ${officerId}`);
 
     this.loading = true;
 
-    this.supervisorService
-      .assignGrievance(this.grievanceId, this.assignForm.value.officerId)
-      .subscribe({
-        next: () => {
-          this.loading = false;
-          this.toastr.success('Grievance assigned successfully');
-          this.router.navigate(['/supervisor/grievances']);
-        },
-        error: (err) => {
-          this.loading = false;
-          this.toastr.error(err?.message || 'Assignment failed');
-        },
-      });
+    this.supervisorService.assignGrievance(this.grievanceId, officerId).subscribe({
+      next: (res) => {
+        console.log('✅ Grievance assigned successfully:', res);
+        this.loading = false;
+        this.toastr.success('Grievance assigned successfully', 'Success');
+        this.router.navigate(['/supervisor/escalations']);
+      },
+      error: (err) => {
+        console.error('❌ Assignment failed:', err);
+        this.loading = false;
+        this.toastr.error(err?.message || 'Failed to assign grievance', 'Assignment Error');
+      },
+    });
   }
 
+  /**
+   * Cancel and go back
+   */
   onCancel(): void {
-    this.router.navigate(['/supervisor/grievances']);
+    this.router.navigate(['/supervisor/escalations']);
+  }
+
+  /**
+   * Get officer name by ID for display
+   */
+  getOfficerName(officerId: number): string {
+    const officer = this.officers.find((o) => o.id === officerId);
+    return officer?.fullName || 'Unknown';
   }
 }
